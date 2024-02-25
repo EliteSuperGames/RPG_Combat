@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816b6bcf12d4a0d48b16f20da45a2dc5, type: 3}
+  m_Name: Enemy_Gail The Snail
+  m_EditorClassIdentifier: 
+  characterName: Gail
+  maxHealth: 50
+  speed: 6
+  physicalPower: 15
+  magicPower: 3
+  playerCharacter: 0
+  battleSize: 1
+  spriteColor: {r: 1, g: 0, b: 0, a: 1}
+  characterSprite: {fileID: -2046704090, guid: 0d8cfe44ad0dba34d847839fa3bd11ef, type: 3}
+  characterPortrait: {fileID: 21300000, guid: b3140e2a7f8567949bf5adad335cdde6, type: 3}
+  abilityList:
+  - {fileID: 11400000, guid: ea7807532a4bc7a49a0a08226c3b2ba0, type: 2}
+  - {fileID: 11400000, guid: da39f9c926d817e428d34814ef5a874a, type: 2}
+  - {fileID: 11400000, guid: 7885b84c03ef6c1498e13c037f1ea6dc, type: 2}
+  - {fileID: 11400000, guid: 5cddb3aa8a44c5b4ebcb3ce644454eb7, type: 2}
+  - {fileID: 11400000, guid: 2cc00bc663162324f80ff10b21696125, type: 2}
+  - {fileID: 11400000, guid: ea85733b7d88f8449bb0739b20ece0b7, type: 2}

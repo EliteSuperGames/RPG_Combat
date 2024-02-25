@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bb2bcba5bd8b2342854fe4b24f44476, type: 3}
+  m_Name: Change Positions
+  m_EditorClassIdentifier: 
+  abilityName: Change Positions
+  targetFaction: 0
+  launchPositions: 00000000010000000200000003000000
+  targetingType: 0
+  landingPositions: 00000000010000000200000003000000
+  effects: []
+  abilityDescription: Move to a new position. Will swap places if a character occupies
+    the new position.
+  cooldownLength: 0
+  baseAbilityPower: 0
+  abilityTypes: 09000000
+  onlyTargetUnconscious: 0
+  canOnlyTargetSelf: 0

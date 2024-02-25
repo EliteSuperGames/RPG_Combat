@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfae99404fb760e48a0aa7df4f612302, type: 3}
+  m_Name: Test Party
+  m_EditorClassIdentifier: 
+  enemyPositions:
+  - {fileID: 11400000, guid: d4730c0b6de60714bbc2dd986c2f0a69, type: 2}
+  - {fileID: 11400000, guid: 86bba05f12347ce459cc76fbe07f0d6f, type: 2}
+  - {fileID: 11400000, guid: 1bcb7ccb9998d7c4a8a1abcedd38dc69, type: 2}
+  - {fileID: 11400000, guid: c03e8fd55c092e74cb63edb1a9f18727, type: 2}

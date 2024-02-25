@@ -1,8 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
@@ -14,7 +15,7 @@ using UnityEngine.UI;
 /// </summary>
 public class UI_ActionPanel : MonoBehaviour
 {
-    public event Action<BattleAction> OnActionButtonClicked;
+    public event Action<Ability> OnAbilityButtonClicked;
 
     [SerializeField]
     private GameObject actionButtonParent;
@@ -52,16 +53,22 @@ public class UI_ActionPanel : MonoBehaviour
     [SerializeField]
     public TMP_Text enemyCharacterHealth;
 
+    [SerializeField]
+    private GameObject battleMessageGO;
+
+    [SerializeField]
+    private TMP_Text battleMessageText;
+
     private void SetEnemyCharacterData(BattleCharacter enemy, bool enemyIsTarget)
     {
         enemyCharacterName.gameObject.SetActive(true);
         enemyCharacterImage.gameObject.SetActive(true);
-        enemyCharacterName.text = enemy.GetCharacterData().characterName;
-        enemyCharacterImage.sprite = enemy.GetCharacterData().characterPortrait;
+        enemyCharacterName.text = enemy.GetCharacterData().CharacterName;
+        enemyCharacterImage.sprite = enemy.GetCharacterData().CharacterPortrait;
 
         if (enemyIsTarget)
         {
-            enemyCharacterHealth.text = enemy.GetCharacterData().currentHealth + "/" + enemy.GetCharacterData().maxHealth;
+            enemyCharacterHealth.text = enemy.GetCharacterData().Health + "/" + enemy.GetCharacterData().MaxHealth;
         }
     }
 
@@ -69,18 +76,18 @@ public class UI_ActionPanel : MonoBehaviour
     {
         characterName.gameObject.SetActive(true);
         characterImage.gameObject.SetActive(true);
-        characterName.text = character.GetCharacterData().characterName;
-        characterImage.sprite = character.GetCharacterData().characterPortrait;
+        characterName.text = character.GetCharacterData().CharacterName;
+        characterImage.sprite = character.GetCharacterData().CharacterPortrait;
 
         if (playerIsTarget)
         {
-            characterHealth.text = character.GetCharacterData().currentHealth + "/" + character.GetCharacterData().maxHealth;
+            characterHealth.text = character.GetCharacterData().Health + "/" + character.GetCharacterData().MaxHealth;
         }
     }
 
     public void SetActiveCharacterData(BattleCharacter activeCharacter)
     {
-        if (activeCharacter.IsPlayer())
+        if (activeCharacter.PlayerCharacter)
         {
             SetPlayerCharacterData(activeCharacter, false);
         }
@@ -90,13 +97,22 @@ public class UI_ActionPanel : MonoBehaviour
         }
     }
 
-    public void ClearEnemyData()
+    public void ClearTargetData(BattleCharacter activeCharacter)
     {
-        enemyCharacterImage.sprite = null;
-        enemyCharacterName.text = null;
-        enemyCharacterImage.gameObject.SetActive(false);
-        enemyCharacterName.gameObject.SetActive(false);
-        enemyCharacterHealth.text = null;
+        if (activeCharacter.PlayerCharacter)
+        {
+            enemyCharacterImage.sprite = null;
+            enemyCharacterName.text = null;
+            // enemyCharacterImage.gameObject.SetActive(false);
+            // enemyCharacterName.gameObject.SetActive(false);
+            enemyCharacterHealth.text = null;
+        }
+        else
+        {
+            characterImage.sprite = null;
+            characterName.text = null;
+            characterHealth.text = null;
+        }
     }
 
     public void ClearPlayerData()
@@ -110,7 +126,7 @@ public class UI_ActionPanel : MonoBehaviour
 
     public void SetTargetCharacterData(BattleCharacter activeCharacter, BattleCharacter targetCharacter)
     {
-        if (activeCharacter.IsPlayer())
+        if (activeCharacter.PlayerCharacter)
         {
             SetEnemyCharacterData(targetCharacter, true);
         }
@@ -118,14 +134,6 @@ public class UI_ActionPanel : MonoBehaviour
         {
             SetPlayerCharacterData(targetCharacter, true);
         }
-        // if (targetCharacter.IsPlayer())
-        // {
-        //     SetPlayerCharacterData(targetCharacter, true);
-        // }
-        // else
-        // {
-        //     SetEnemyCharacterData(targetCharacter, true);
-        // }
     }
 
     public void ClearCharacterData()
@@ -144,14 +152,17 @@ public class UI_ActionPanel : MonoBehaviour
         enemyCharacterHealth.text = null;
     }
 
-    public void SetAvailableActions(List<BattleAction> availableActions)
+    public void SetAvailableAbilities(List<EligibleAbility> availableAbilities)
     {
-        Debug.Log("UI_ActionPanel SetAvailableActions");
         ClearActionButtons();
-        foreach (BattleAction action in availableActions)
+
+        foreach (EligibleAbility eligibleAbility in availableAbilities)
         {
-            Debug.Log("action: " + action.ToString());
-            CreateActionButton(action);
+            CreateAbilityButton(
+                eligibleAbility.Ability,
+                eligibleAbility.EligibleBasedOnLaunchPosition,
+                eligibleAbility.EligibleBasedOnLandingTargets
+            );
         }
     }
 
@@ -163,34 +174,96 @@ public class UI_ActionPanel : MonoBehaviour
         }
     }
 
-    private void CreateActionButton(BattleAction action)
+    private void CreateAbilityButton(Ability ability, bool IsEligibleBasedOnOwnPosition, bool IsEligibleBasedOnTargetPositions)
     {
-        Debug.Log("CreateActionButton: " + action.ToString());
-
-        // GameObject buttonGO = new GameObject(action.ToString());
         GameObject buttonGO = Instantiate(actionButtonPrefab, actionButtonParent.transform);
         Button button = buttonGO.GetComponent<Button>();
 
-        button.GetComponentInChildren<TMP_Text>().text = action.ToString();
-        button.onClick.AddListener(() => HandleActionButtonClick(action));
-    }
+        button.GetComponentInChildren<TMP_Text>().text = ability.AbilityData.abilityName.ToString();
 
-    private void HandleActionButtonClick(BattleAction action)
-    {
-        Debug.Log("Button Clicked: " + action.ToString());
-        OnActionButtonClicked?.Invoke(action);
-    }
-
-    public void SetActionData(BattleAction action, BattleCharacter character)
-    {
-        if (character.IsPlayer())
+        bool onCooldown = ability.CooldownTimer > 0;
+        button.interactable = IsEligibleBasedOnOwnPosition && IsEligibleBasedOnTargetPositions && !onCooldown;
+        AbilityButtonHoverListener hoverListener = button.AddComponent<AbilityButtonHoverListener>();
+        hoverListener.ability = ability;
+        if (!IsEligibleBasedOnOwnPosition)
         {
-            actionText.text = action.ToString();
+            hoverListener.OnPointerEnterEvent += (eventData) => DisabledAbilityPointerEnter(eventData, "Out Of Position");
+            hoverListener.OnPointerExitEvent += DisabledAbilityPointerExit;
+        }
+        else if (!IsEligibleBasedOnTargetPositions)
+        {
+            hoverListener.OnPointerEnterEvent += (eventData) => DisabledAbilityPointerEnter(eventData, "No Target Available");
+            hoverListener.OnPointerExitEvent += DisabledAbilityPointerExit;
+        }
+        else if (onCooldown)
+        {
+            hoverListener.OnPointerEnterEvent += (eventData) => DisabledAbilityPointerEnter(eventData, "On Cooldown");
+            hoverListener.OnPointerExitEvent += DisabledAbilityPointerExit;
+
+            // how to give the battleMessage.text a different text when this button gets hovered? I want it to say "ON COOLDOWN" or something
+        }
+        button.onClick.AddListener(() => HandleAbilityButtonClick(ability));
+    }
+
+    private void DisabledAbilityPointerEnter(PointerEventData eventData, string message)
+    {
+        battleMessageGO.gameObject.SetActive(true);
+        battleMessageText.text = message;
+    }
+
+    private void DisabledAbilityPointerExit(PointerEventData eventData)
+    {
+        battleMessageGO.gameObject.SetActive(false);
+    }
+
+    // private void NoTargetsAbilityPointerEnter(PointerEventData eventData)
+    // {
+    //     battleMessageGO.gameObject.SetActive(true);
+    //     battleMessageText.text = "On Cooldown";
+    // }
+
+    // private void NotargetsAbilityPointerExit(PointerEventData eventData)
+    // {
+    //     battleMessageGO.gameObject.SetActive(false);
+    // }
+
+    // private void CooldownAbilityPointerEnter(PointerEventData eventData)
+    // {
+    //     battleMessageGO.gameObject.SetActive(true);
+    //     battleMessageText.text = "No Target Available";
+    // }
+
+    // private void CooldownAbilityPointerExit(PointerEventData eventData)
+    // {
+    //     battleMessageGO.gameObject.SetActive(false);
+    // }
+
+    // private void DisabledAbilityPointerEnter(PointerEventData eventData)
+    // {
+    //     battleMessageGO.gameObject.SetActive(true);
+    //     battleMessageText.text = "Out Of Position";
+    // }
+
+    // private void DisabledAbilityPointerExit(PointerEventData eventData)
+    // {
+    //     battleMessageGO.gameObject.SetActive(false);
+    // }
+
+    private void HandleAbilityButtonClick(Ability ability)
+    {
+        OnAbilityButtonClicked?.Invoke(ability);
+    }
+
+    public void SetAbilityData(Ability ability, BattleCharacter character)
+    {
+        if (character.PlayerCharacter)
+        {
+            actionText.text = ability.AbilityData.abilityName.ToString();
             enemyActionText.text = null;
         }
         else
         {
-            enemyActionText.text = action.ToString();
+            enemyActionText.text = ability.AbilityData.abilityName.ToString();
             actionText.text = null;
         }
     }

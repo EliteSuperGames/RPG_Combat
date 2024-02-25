@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
@@ -18,419 +19,374 @@ public class BattleManager : MonoBehaviour
 {
     [Header("UI Panels")]
     [SerializeField]
-    private UI_ActionPanel actionPanel;
-
-    [SerializeField]
     private BattleUIParent battleUIParent;
 
     [Space(15)]
     [Header("Battle Positions")]
     [SerializeField]
-    private Transform[] playerPositions;
+    private List<BattlePosition> playerPositions = new List<BattlePosition>();
+    public List<BattlePosition> PlayerPositions
+    {
+        get { return playerPositions; }
+        set { playerPositions = value; }
+    }
 
     [SerializeField]
-    private Transform[] enemyPositions;
+    private List<BattlePosition> enemyPositions = new List<BattlePosition>();
+    public List<BattlePosition> EnemyPositions
+    {
+        get { return enemyPositions; }
+        set { enemyPositions = value; }
+    }
+
+    private List<BattlePosition> allPositions = new List<BattlePosition>();
+    public List<BattlePosition> AllPositions
+    {
+        get { return allPositions; }
+        set { allPositions = value; }
+    }
 
     [Space(15)]
     [Header("Character Data")]
     [SerializeField]
     private List<CharacterData> playerBaseCharacters;
+    public List<CharacterData> PlayerBaseCharacters
+    {
+        get { return playerBaseCharacters; }
+        set { playerBaseCharacters = value; }
+    }
 
     [SerializeField]
-    private List<CharacterDataSO> enemyBaseCharacters;
+    private List<CharacterData> enemyBaseCharacters;
+    public List<CharacterData> EnemyBaseCharacters
+    {
+        get { return enemyBaseCharacters; }
+        set { enemyBaseCharacters = value; }
+    }
+
+    [SerializeField]
+    private EnemyParty enemyParty;
+    public EnemyParty EnemyParty
+    {
+        get { return enemyParty; }
+        set { enemyParty = value; }
+    }
 
     [Space(15)]
     [Header("BattleCharacters")]
-    public List<BattleCharacter> playerBattleCharacters = new List<BattleCharacter>();
+    private List<BattleCharacter> playerBattleCharacters = new List<BattleCharacter>();
+    public List<BattleCharacter> PlayerBattleCharacters
+    {
+        get { return playerBattleCharacters; }
+        set { playerBattleCharacters = value; }
+    }
 
-    public List<BattleCharacter> enemyBattleCharacters = new List<BattleCharacter>();
+    [SerializeField]
+    private List<BattleCharacter> enemyBattleCharacters = new List<BattleCharacter>();
+    public List<BattleCharacter> EnemyBattleCharacters
+    {
+        get { return enemyBattleCharacters; }
+        set { enemyBattleCharacters = value; }
+    }
 
     [Space(15)]
     [Header("Active Character")]
     [SerializeField]
-    public BattleCharacter activeCharacter;
+    private BattleCharacter activeCharacter;
+    public BattleCharacter ActiveCharacter
+    {
+        get { return activeCharacter; }
+        set { activeCharacter = value; }
+    }
 
     [Space(15)]
     [Header("State Machine for BattleManager")]
     [SerializeField]
-    public BattleManagerState currentBattleState = BattleManagerState.ChoosingAction;
+    private BattleManagerState currentBattleState = BattleManagerState.ChoosingAction;
+    public BattleManagerState CurrentBattleState
+    {
+        get { return currentBattleState; }
+        set { HandleStateChange(value); }
+    }
+
+    private void HandleStateChange(BattleManagerState value)
+    {
+        Debug.Log("HandleStateChange");
+        if (currentBattleState == BattleManagerState.ChoosingEnemyTarget || currentBattleState == BattleManagerState.ChoosingAllyTarget)
+        {
+            StopCoroutine(HandleTargetSelection(currentBattleState));
+            isHandlingTargetSelection = false;
+        }
+
+        currentBattleState = value;
+
+        if (currentBattleState == BattleManagerState.ChoosingEnemyTarget || currentBattleState == BattleManagerState.ChoosingAllyTarget)
+        {
+            StartCoroutine(HandleTargetSelection(currentBattleState));
+            isHandlingTargetSelection = true;
+        }
+    }
 
     [Space(15)]
     [Header("Prefabs")]
     [ReadOnly]
     public GameObject battleCharacterPrefab;
 
-    private BattleCharacter activeTarget;
-
-    private enum BattleCharacterSubset
+    [SerializeField]
+    private Ability selectedAbility;
+    private Ability SelectedAbility
     {
-        All,
-        Players,
-        Enemies
+        get { return selectedAbility; }
+        set { selectedAbility = value; }
+    }
+
+    [SerializeField]
+    private BattleCharacter activeTarget;
+    public BattleCharacter ActiveTarget
+    {
+        get { return activeTarget; }
+        set { activeTarget = value; }
+    }
+
+    [SerializeField]
+    private bool isHandlingTargetSelection = false;
+    public bool IsHandlingTargetSelection
+    {
+        get { return isHandlingTargetSelection; }
+        set { isHandlingTargetSelection = value; }
+    }
+
+    [SerializeField]
+    private List<BattlePosition> currentValidTargets = new List<BattlePosition>();
+    public List<BattlePosition> CurrentValidTargets
+    {
+        get { return currentValidTargets; }
+        set { currentValidTargets = value; }
     }
 
     void Awake()
     {
-        Debug.Log("BattleManager Awake");
-        actionPanel.OnActionButtonClicked += HandleActionButtonClick;
+        battleUIParent.OnAbilityButtonClicked += HandleAbilityButtonClick;
+        AllPositions = PlayerPositions.Concat(EnemyPositions).ToList();
     }
 
-    private void CallMethodOnAllBattleCharacters(Action<BattleCharacter> action, BattleCharacterSubset subset)
+    void OnDestroy()
     {
-        // not super clear on the whole purpose of IEnumerable, but seems like it
-        // lets you initialize a collection of objects and delay assigning them?
-        // if I tried List<BattleCharacter> instead, the syntax would be very different
-        IEnumerable<BattleCharacter> charactersToProcess;
-
-        switch (subset)
-        {
-            case BattleCharacterSubset.Players:
-                charactersToProcess = playerBattleCharacters;
-                break;
-            case BattleCharacterSubset.Enemies:
-                charactersToProcess = enemyBattleCharacters;
-                break;
-            default:
-                charactersToProcess = playerBattleCharacters.Concat(enemyBattleCharacters);
-                break;
-        }
-
-        foreach (var character in charactersToProcess)
-        {
-            action(character);
-        }
+        battleUIParent.OnAbilityButtonClicked -= HandleAbilityButtonClick;
+        TurnOrderManager.Instance.OnActiveCharacterChanged -= HandleTurnChange;
     }
 
-    private List<BattleCharacter> GetAllBattleCharacters()
+    private void HandleAbilityButtonClick(Ability ability)
     {
-        List<BattleCharacter> allChars = new List<BattleCharacter>();
-        allChars.AddRange(playerBattleCharacters);
-        allChars.AddRange(enemyBattleCharacters);
-        return allChars;
-    }
-
-    // will later pass the actual ability being used so it will know the possible launch and landing positions.
-    private void SetPossibleTargets(BattleAction action)
-    {
-        CallMethodOnAllBattleCharacters(character => character.HideTargetableIndicator(), BattleCharacterSubset.All);
-
-        switch (action)
+        SelectedAbility = ability;
+        Debug.Log(selectedAbility.AbilityData.abilityName);
+        if (ability.AbilityData.abilityTypes.Contains(AbilityType.SkipTurn))
         {
-            case BattleAction.Attack:
-
-                {
-                    CallMethodOnAllBattleCharacters(
-                        character => character.ShowTargetableIndicator(true),
-                        activeCharacter.IsPlayer() ? BattleCharacterSubset.Enemies : BattleCharacterSubset.Players
-                    );
-                }
-                break;
-            case BattleAction.Heal:
-            {
-                {
-                    CallMethodOnAllBattleCharacters(
-                        character => character.ShowTargetableIndicator(false),
-                        activeCharacter.IsPlayer() ? BattleCharacterSubset.Players : BattleCharacterSubset.Enemies
-                    );
-                }
-
-                // {
-                //     if (activeCharacter.IsPlayer())
-                //     {
-                //         foreach (BattleCharacter character in playerBattleCharacters)
-                //         {
-                //             character.ShowTargetableIndicator(false);
-                //         }
-                //     }
-                //     else
-                //     {
-                //         if (!activeCharacter.IsPlayer())
-                //         {
-                //             foreach (BattleCharacter character in enemyBattleCharacters)
-                //             {
-                //                 character.ShowTargetableIndicator(false);
-                //             }
-                //         }
-                //     }
-                // }
-                break;
-            }
+            battleUIParent.ClearCharacterData();
+            TurnOrderManager.Instance.CharacterTurnComplete(ActiveCharacter);
+            return;
         }
-    }
 
-    /// <summary>
-    /// When an "Action" is chosen in the actionPanel, this method will clear the "targetedBG"
-    /// graphics from every character, then re-add the targetedBG for the characters that are
-    /// potential targets for the chosen action. Ex: Allies can only heal allies, so only they
-    /// are potential heal targets
-    /// </summary>
-    private void HandleActionButtonClick(BattleAction action)
-    {
-        actionPanel.SetActionData(action, activeCharacter);
-        CallMethodOnAllBattleCharacters(character => character.HideTargetedBG(), BattleCharacterSubset.All);
+        battleUIParent.SetAbilityData(ability, activeCharacter);
+        TargetSelectionHandler.HideAllTargetIndicators(AllPositions);
+        TargetSelectionHandler.SetAbilityTargets(ability, ActiveCharacter, ref currentValidTargets, PlayerPositions, EnemyPositions);
 
-        if (action == BattleAction.Attack)
-        {
-            SetPossibleTargets(action);
-            currentBattleState = BattleManagerState.ChoosingEnemyTarget;
-        }
-        else if (action == BattleAction.Heal)
-        {
-            SetPossibleTargets(action);
-            currentBattleState = BattleManagerState.ChoosingAllyTarget;
-        }
+        CurrentBattleState =
+            (ability.AbilityData.targetFaction == TargetFaction.Enemies)
+                ? BattleManagerState.ChoosingEnemyTarget
+                : BattleManagerState.ChoosingAllyTarget;
     }
 
     private void HandleTurnChange(BattleCharacter newActiveCharacter)
     {
-        if (activeCharacter != null)
-        {
-            activeCharacter.HideActiveCharacterIndicator();
-        }
-        activeCharacter = newActiveCharacter;
+        Debug.Log("HandleTurnChange");
+        Debug.Log(newActiveCharacter.CharData.CharacterName);
+        Debug.Log(newActiveCharacter.CharData.Abilities.Count);
+        // Debug.LogError("HandleTurnChange: " + newActiveCharacter.CharData.CharacterName);
+        // Debug.LogError("character abilities: " + newActiveCharacter.CharData.Abilities.Count);
+        // Debug.LogError("First ability: " + newActiveCharacter.CharData.Abilities[0].AbilityData.abilityName);
+        ActiveCharacter?.BattlePosition.HideActiveCharacterIndicator();
+        ActiveCharacter = newActiveCharacter;
+        ActiveCharacter?.BattlePosition.EnableActiveCharacterIndicator();
 
-        activeCharacter.ShowActiveCharacterIndicator();
-        List<BattleAction> availableActions = GetAvailableActionsForCharacter(activeCharacter);
-        battleUIParent.ShowActionPanel();
-        actionPanel.SetAvailableActions(availableActions);
-        actionPanel.SetActiveCharacterData(activeCharacter);
-    }
-
-    private List<BattleAction> GetAvailableActionsForCharacter(BattleCharacter character)
-    {
-        return character.GetCharacterData().battleActions;
+        battleUIParent.ShowActionPanelForCharacter(
+            newActiveCharacter,
+            TargetSelectionHandler.DetermineAvailableAbilitiesBasedOnPosition(newActiveCharacter, PlayerPositions, EnemyPositions)
+        );
+        TurnOrderManager.Instance.StartTurn(activeCharacter);
     }
 
     public void PopulatePlayersFromParty(List<CharacterData> players)
     {
-        // enemies dont have baseCharacters because they are just instantiated using their
-        // CharacterDataSO data. Player Characters use a baseCharacter (CharacterData type) because their
-        // CharacterDataSO (scriptable Object) is not updated during runtime, only the CharacterData is.
-        playerBaseCharacters = players;
+        PlayerBaseCharacters = players;
+        EnemyBaseCharacters = SetEnemies();
         StartBattle();
     }
 
     void StartBattle()
     {
+        Debug.Log("StartBattle");
         List<CharacterData> allChars = new List<CharacterData>();
         allChars.AddRange(playerBaseCharacters);
-        allChars.AddRange(SetEnemies());
-        SetBattleCharacters(allChars);
+        allChars.AddRange(EnemyBaseCharacters);
+        TurnOrderManager.Instance.OnActiveCharacterChanged += HandleTurnChange;
+        TurnOrderManager.Instance.SetMasterCharacterList(SetBattleCharacters(allChars));
+        TurnOrderManager.Instance.CreateNewTurnOrder();
+    }
+
+    void EndBattle()
+    {
+        TurnOrderManager.Instance.OnActiveCharacterChanged -= HandleTurnChange;
+        foreach (BattleCharacter character in PlayerBattleCharacters)
+        {
+            character.BattlePosition.SetOccupyingCharacter(null);
+            Destroy(character.gameObject);
+        }
+        foreach (BattleCharacter character in EnemyBattleCharacters)
+        {
+            character.BattlePosition.SetOccupyingCharacter(null);
+            Destroy(character.gameObject);
+        }
+        PlayerBattleCharacters.Clear();
+        EnemyBattleCharacters.Clear();
     }
 
     List<CharacterData> SetEnemies()
     {
         List<CharacterData> enemies = new List<CharacterData>();
-        foreach (CharacterDataSO character in enemyBaseCharacters)
+        int index = 0;
+
+        foreach (CharacterDataSO character in EnemyParty.enemyPositions)
         {
-            CharacterData charData = new CharacterData(character);
-            enemies.Add(charData);
+            CharacterData newEnemy = new CharacterData(character) { FormationPosition = index };
+            enemies.Add(newEnemy);
+            index++;
         }
+
         return enemies;
     }
 
-    private void SetBattleCharacters(List<CharacterData> characters)
+    private List<BattleCharacter> SetBattleCharacters(List<CharacterData> characters)
     {
-        int currentEnemyIndex = 0; // enemies are index 4-7
-        playerBattleCharacters.Clear();
-        enemyBattleCharacters.Clear();
+        Debug.Log("SetBattleCharacters");
+        PlayerBattleCharacters.Clear();
+        EnemyBattleCharacters.Clear();
 
+        Debug.Log(characters.Count);
         foreach (CharacterData character in characters)
         {
+            Debug.Log(character.CharacterName);
             GameObject battleCharObject = Instantiate(battleCharacterPrefab, Vector3.zero, Quaternion.identity);
             BattleCharacter battleCharacter = battleCharObject.GetComponent<BattleCharacter>();
             battleCharacter.InitializeCharacter(character);
-
-            battleCharObject.name = character.characterName;
-
-            if (character.playerCharacter)
+            battleCharObject.name = character.CharacterName;
+            if (character.PlayerCharacter)
             {
-                if (battleCharacter.CurrentBattlePosition != -1)
-                {
-                    // Character has a specified position, use it
-                    battleCharacter.SetPositionIndex(battleCharacter.CurrentBattlePosition);
-                    playerBattleCharacters.Add(battleCharacter);
-                }
-                else
-                {
-                    // Character doesn't have a specified position, set later
-                    // ** this probably won't actually occur after the game is fully setup,
-                    // all characters should receive a battle position as they get added
-                    // to the party **
-                    playerBattleCharacters.Add(battleCharacter);
-                }
+                BattlePosition desiredPosition = TargetSelectionHandler.GetPlayerPositionByNumber(PlayerPositions, battleCharacter.FormationPosition);
+                desiredPosition.SetOccupyingCharacter(battleCharacter);
+                PlayerBattleCharacters.Add(battleCharacter);
             }
             else
             {
-                battleCharacter.SetPositionIndex(currentEnemyIndex);
-                battleCharacter.transform.position = enemyPositions[currentEnemyIndex].position;
-                battleCharacter.transform.SetParent(enemyPositions[currentEnemyIndex].transform);
-                currentEnemyIndex++;
-                enemyBattleCharacters.Add(battleCharacter);
-            }
-        }
-
-        int availablePosition = 0;
-        foreach (BattleCharacter playerCharacter in playerBattleCharacters)
-        {
-            if (playerCharacter.CurrentBattlePosition == -1)
-            {
-                playerCharacter.SetPositionIndex(availablePosition);
-                playerCharacter.transform.position = playerPositions[availablePosition].position;
-                playerCharacter.transform.SetParent(playerPositions[availablePosition].transform);
-                availablePosition++;
+                BattlePosition desiredPosition = TargetSelectionHandler.GetPlayerPositionByNumber(EnemyPositions, battleCharacter.FormationPosition);
+                desiredPosition.SetOccupyingCharacter(battleCharacter);
+                EnemyBattleCharacters.Add(battleCharacter);
             }
         }
 
         List<BattleCharacter> allChars = new List<BattleCharacter>();
-        allChars.AddRange(playerBattleCharacters);
-        allChars.AddRange(enemyBattleCharacters);
+        allChars.AddRange(PlayerBattleCharacters);
+        allChars.AddRange(EnemyBattleCharacters);
         foreach (BattleCharacter character in allChars)
         {
-            character.HideActiveCharacterIndicator();
+            character.BattlePosition.HideActiveCharacterIndicator();
         }
-        TurnOrderManager.Instance.OnActiveCharacterChanged += HandleTurnChange;
-        TurnOrderManager.Instance.SetMasterCharacterList(allChars);
+        return allChars;
     }
 
-    void HandleAllyTargetSelection()
+    #region Calls to UI Action Panel
+    private void ClearUITargetData()
     {
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D[] racastHits = Physics2D.RaycastAll(mousePosition, Vector2.zero);
-        bool validTargetFound = false;
-        BattleCharacter targetCharacter;
-        foreach (var hit in racastHits)
-        {
-            GameObject targetObject = hit.collider.gameObject;
-            targetCharacter = targetObject.GetComponent<BattleCharacter>();
-            if (targetCharacter != null && CharactersAreSameFaction(activeCharacter, targetCharacter))
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    OnAllyClick(targetCharacter);
-                }
-                else
-                {
-                    OnAllyHover(targetCharacter);
-                }
-
-                validTargetFound = true;
-                break;
-            }
-        }
-
-        if (!validTargetFound)
-        {
-            DisableAllCharacterSelectors();
-        }
+        battleUIParent.ClearTargetData(ActiveCharacter);
     }
+    #endregion
 
-    void HandleEnemyTargetSelection()
-    {
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D[] raycastHits = Physics2D.RaycastAll(mousePosition, Vector2.zero);
-        bool validTargetFound = false;
-        BattleCharacter targetCharacter = null;
-        foreach (var hit in raycastHits)
-        {
-            GameObject targetObject = hit.collider.gameObject;
-            targetCharacter = targetObject.GetComponent<BattleCharacter>();
-
-            if (targetCharacter != null && !CharactersAreSameFaction(activeCharacter, targetCharacter))
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    OnEnemyClick(targetCharacter);
-                }
-                else
-                {
-                    OnEnemyHover(targetCharacter);
-                }
-                validTargetFound = true;
-                break;
-            }
-        }
-
-        if (!validTargetFound)
-        {
-            DisableAllCharacterSelectors();
-        }
-    }
-
-    void DisableAllCharacterSelectors()
-    {
-        CallMethodOnAllBattleCharacters(character => character.HideTargetedBG(), BattleCharacterSubset.All);
-        actionPanel.ClearEnemyData();
-    }
-
-    void OnAllyClick(BattleCharacter target)
-    {
-        activeCharacter.Heal(target);
-        activeCharacter.EndTurn();
-        HideAllTargetIndicators();
-        TurnOrderManager.Instance.CharacterTurnComplete(activeCharacter);
-    }
-
-    void OnEnemyClick(BattleCharacter target)
-    {
-        activeCharacter.Attack(target);
-        currentBattleState = BattleManagerState.ChoosingAction;
-        activeCharacter.EndTurn();
-        HideAllTargetIndicators();
-        actionPanel.ClearCharacterData();
-        TurnOrderManager.Instance.CharacterTurnComplete(activeCharacter);
-    }
-
-    private void HideAllTargetIndicators()
-    {
-        CallMethodOnAllBattleCharacters(character => character.HideTargetableIndicator(), BattleCharacterSubset.All);
-        CallMethodOnAllBattleCharacters(character => character.HideTargetedBG(), BattleCharacterSubset.All);
-    }
 
     private bool CharactersAreSameFaction(BattleCharacter charA, BattleCharacter charB)
     {
-        return charA.IsPlayer() && charB.IsPlayer() || !charA.IsPlayer() && !charB.IsPlayer();
+        return charA.PlayerCharacter && charB.PlayerCharacter || !charA.PlayerCharacter && !charB.PlayerCharacter;
     }
 
-    void OnAllyHover(BattleCharacter hoverTarget)
-    {
-        if (activeTarget != null)
-        {
-            activeTarget.HideTargetedBG();
-        }
+    void Update() { }
 
-        if (CharactersAreSameFaction(activeCharacter, hoverTarget))
+    private IEnumerator HandleTargetSelection(BattleManagerState targetSelectionState)
+    {
+        IsHandlingTargetSelection = true;
+        while (CurrentBattleState == targetSelectionState)
         {
-            activeTarget = hoverTarget;
-            hoverTarget.ShowTargetedBG(false);
-            actionPanel.SetTargetCharacterData(activeCharacter, hoverTarget);
+            yield return null;
+            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            BattleCharacter targetCharacter = TargetSelectionHandler.FindTargetCharacter(mousePosition);
+            bool validTargetFound = false;
+
+            if (targetCharacter != null)
+            {
+                bool targetingSameFaction = CharactersAreSameFaction(ActiveCharacter, targetCharacter);
+                if (
+                    (targetSelectionState == BattleManagerState.ChoosingEnemyTarget && !targetingSameFaction)
+                    || (targetSelectionState == BattleManagerState.ChoosingAllyTarget && targetingSameFaction)
+                )
+                {
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        if (CurrentValidTargets.Contains(targetCharacter.BattlePosition))
+                        {
+                            TargetSelectionHandler.OnTargetClick(
+                                targetCharacter,
+                                ActiveCharacter,
+                                SelectedAbility,
+                                ref currentBattleState,
+                                ref isHandlingTargetSelection,
+                                AllPositions,
+                                battleUIParent,
+                                PlayerPositions,
+                                EnemyPositions
+                            );
+                        }
+                    }
+                    else
+                    {
+                        TargetSelectionHandler.OnTargetHover(
+                            targetCharacter,
+                            targetingSameFaction,
+                            ref activeTarget,
+                            activeCharacter,
+                            playerPositions,
+                            enemyPositions,
+                            battleUIParent,
+                            SelectedAbility
+                        );
+                    }
+                    validTargetFound = true;
+                }
+            }
+
+            if (!validTargetFound)
+            {
+                ClearUITargetData();
+                foreach (var pos in AllPositions)
+                {
+                    pos.HideTransparentTarget();
+                }
+            }
         }
+        isHandlingTargetSelection = false;
     }
 
-    void OnEnemyHover(BattleCharacter hoverTarget)
+    private void MoveCharacter(BattleCharacter character, BattlePosition newPosition)
     {
-        if (activeTarget != null)
-        {
-            activeTarget.HideTargetedBG();
-        }
-
-        if (!CharactersAreSameFaction(activeCharacter, hoverTarget))
-        {
-            activeTarget = hoverTarget;
-            activeTarget.ShowTargetedBG(true);
-            actionPanel.SetTargetCharacterData(activeCharacter, hoverTarget);
-        }
-    }
-
-    void Update()
-    {
-        if (currentBattleState == BattleManagerState.ChoosingEnemyTarget)
-        {
-            HandleEnemyTargetSelection();
-        }
-        else if (currentBattleState == BattleManagerState.ChoosingAllyTarget)
-        {
-            HandleAllyTargetSelection();
-        }
+        character.BattlePosition.SetOccupyingCharacter(null);
+        character.BattlePosition = newPosition;
+        newPosition.SetOccupyingCharacter(character);
     }
 }

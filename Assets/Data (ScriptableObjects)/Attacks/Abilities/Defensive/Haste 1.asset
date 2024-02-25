@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bb2bcba5bd8b2342854fe4b24f44476, type: 3}
+  m_Name: Haste 1
+  m_EditorClassIdentifier: 
+  abilityName: Haste 1
+  targetFaction: 0
+  launchPositions: 00000000010000000200000003000000
+  targetingType: 0
+  landingPositions: 00000000010000000200000003000000
+  effects:
+  - {fileID: 11400000, guid: f20db8def8abd7d4d815323a0864bb28, type: 2}
+  abilityDescription: Increases speed by 10 for 2 rounds.
+  cooldownLength: 0
+  baseAbilityPower: 0
+  abilityTypes: 06000000
+  onlyTargetUnconscious: 0
+  canOnlyTargetSelf: 0
