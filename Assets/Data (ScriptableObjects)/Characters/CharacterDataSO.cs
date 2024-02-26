@@ -27,6 +27,12 @@ public class CharacterDataSO : ScriptableObject
     public Sprite characterSprite;
     public Sprite characterPortrait;
     public List<AbilityData> abilityList = new List<AbilityData>();
+
+    [Range(0, 3)]
+    public int forwardMovement;
+
+    [Range(0, 3)]
+    public int backwardMovement;
     // public SpriteRenderer characterSpriteRenderer;
     // public string spriteAddressableKey;
     // public string initialSpriteName;

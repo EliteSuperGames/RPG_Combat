@@ -7,6 +7,6 @@ public class EligibleAbility
     public EligibleAbility(Ability ability)
     {
         Ability = ability;
-        EligibleBasedOnLaunchPosition = false;
+        // EligibleBasedOnLaunchPosition = false;
     }
 }

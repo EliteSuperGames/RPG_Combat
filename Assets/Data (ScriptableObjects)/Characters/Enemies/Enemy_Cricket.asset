@@ -25,6 +25,6 @@ MonoBehaviour:
   abilityList:
   - {fileID: 11400000, guid: a0253ef68f4e929439ef321c37113819, type: 2}
   - {fileID: 11400000, guid: da39f9c926d817e428d34814ef5a874a, type: 2}
-  - {fileID: 11400000, guid: 5cddb3aa8a44c5b4ebcb3ce644454eb7, type: 2}
   - {fileID: 11400000, guid: 2cc00bc663162324f80ff10b21696125, type: 2}
-  - {fileID: 11400000, guid: ea85733b7d88f8449bb0739b20ece0b7, type: 2}
+  forwardMovement: 3
+  backwardMovement: 2

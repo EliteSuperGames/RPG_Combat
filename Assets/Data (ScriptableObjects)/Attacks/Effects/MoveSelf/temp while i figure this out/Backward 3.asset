@@ -10,12 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29ff8e3dfcaf34a4282ae78021c688a7, type: 3}
-  m_Name: Forward 1 (100%)
+  m_Name: Backward 3
   m_EditorClassIdentifier: 
   effectChance: 100
-  effectName: Self Forward 1
+  effectName: Self backward 3
   effectDuration: 0
-  effectDescription: Moves self forward 1 space
+  effectApplicationType: 0
+  applicationUrgency: 1
+  effectDescription: 
   effectPolarity: 0
-  moveDistance: 1
-  moveDirection: 0
+  moveDistance: -3

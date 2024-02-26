@@ -5,6 +5,8 @@ using UnityEngine;
 
 public static class EffectHandler
 {
+    public static event Action<BattleCharacter, int> OnMoveCharacterRequest = delegate { };
+
     /// <summary>
     /// If the target already has a stun or stat modifier applied, it will just refresh the duration (if the new effect's duration is longer than the existing)
     /// Otherwise, it will add a new effect to the character
@@ -12,7 +14,7 @@ public static class EffectHandler
     /// <param name="caster"></param>
     /// <param name="target"></param>
     /// <param name="effectData"></param>
-    public static void AddEffectToCharacter(BattleCharacter caster, BattleCharacter target, StatusEffectData effectData)
+    public static void AddInitialEffectToCharacter(BattleCharacter caster, BattleCharacter target, StatusEffectData effectData)
     {
         EffectInstance existingEffect = target.GetEffectInstance(effectData);
         if (!DetermineAbilitySuccessChance(effectData))
@@ -50,6 +52,15 @@ public static class EffectHandler
             }
             // how to access the effectData.statModifier ?
         }
+        else if (effectData is MoveSelfEffectData moveSelfEffectData)
+        {
+            Debug.Log("invoking OnMoveCharacterRequest");
+            OnMoveCharacterRequest?.Invoke(target, moveSelfEffectData.moveDistance);
+        }
+        else if (effectData is MoveTargetEffectData moveTargetEffectData)
+        {
+            OnMoveCharacterRequest?.Invoke(target, moveTargetEffectData.moveDistance);
+        }
         else
         {
             target.AddStatusEffect(caster, effectData);
@@ -68,7 +79,7 @@ public static class EffectHandler
         existingEffectInstance.remainingDuration = Math.Max(existingEffectInstance.remainingDuration, effectData.effectDuration);
     }
 
-    public static void ProcessAllEffects(BattleCharacter character)
+    public static void ProcessAllPeriodicEffects(BattleCharacter character)
     {
         foreach (EffectInstance effectInstance in character.StatusEffects)
         {
@@ -98,6 +109,12 @@ public static class EffectHandler
                 break;
             case StatModifierEffectData statModEffect:
                 // ApplyStatModifier(character, statModEffect, effectInstance);
+                break;
+            case MoveSelfEffectData moveSelfEffect:
+                OnMoveCharacterRequest(character, moveSelfEffect.moveDistance);
+                break;
+            case MoveTargetEffectData moveTargetEffect:
+                OnMoveCharacterRequest(character, moveTargetEffect.moveDistance);
                 break;
         }
     }

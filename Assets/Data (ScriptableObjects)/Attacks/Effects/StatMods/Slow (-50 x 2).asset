@@ -16,8 +16,10 @@ MonoBehaviour:
   effectName: Slow
   effectDuration: 2
   effectApplicationType: 1
+  applicationUrgency: 1
   effectDescription: Reduces Speed by 50 for 2 rounds.
   effectPolarity: 1
+  effectType: 3
   statModifier:
     modifierName: Slow
     magicPowerMod: 0

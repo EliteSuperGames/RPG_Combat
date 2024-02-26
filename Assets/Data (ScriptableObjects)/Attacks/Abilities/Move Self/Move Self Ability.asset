@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bb2bcba5bd8b2342854fe4b24f44476, type: 3}
-  m_Name: Change Positions
+  m_Name: Move Self Ability
   m_EditorClassIdentifier: 
   abilityName: Change Positions
   targetFaction: 0
   launchPositions: 00000000010000000200000003000000
   targetingType: 0
-  landingPositions: 00000000010000000200000003000000
+  landingPositions: 
   effects: []
-  abilityDescription: Move to a new position. Will swap places if a character occupies
-    the new position.
+  abilityDescription: 
   cooldownLength: 0
   baseAbilityPower: 0
-  abilityTypes: 09000000
+  abilityTypes: 07000000
   onlyTargetUnconscious: 0
   canOnlyTargetSelf: 0

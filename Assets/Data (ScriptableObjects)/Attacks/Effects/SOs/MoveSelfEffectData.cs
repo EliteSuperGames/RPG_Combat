@@ -6,11 +6,4 @@ using UnityEngine;
 public class MoveSelfEffectData : StatusEffectData
 {
     public int moveDistance;
-    public MoveDirection moveDirection;
-}
-
-public enum MoveDirection
-{
-    Forward,
-    Backward
 }

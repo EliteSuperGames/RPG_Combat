@@ -87,6 +87,11 @@ public class BattleCharacter : MonoBehaviour
     }
 
     public bool PlayerCharacter { get; private set; }
+    public Vector3 targetPosition;
+    public float moveSpeed = 1f;
+    public bool isMoving = false;
+
+    // public static event Action<BattleCharacter, int> OnSwapPositionsRequested = delegate { };
 
     [SerializeField]
     [Header("Other")]
@@ -106,6 +111,19 @@ public class BattleCharacter : MonoBehaviour
         if (NegativeStatModifiers == null)
             NegativeStatModifiers = new List<StatModifier>();
         HealthbarController = FindObjectOfType<HealthbarController>();
+    }
+
+    void Update()
+    {
+        // if (isMoving)
+        // {
+        //     transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+        //     if (transform.position == targetPosition)
+        //     {
+        //         isMoving = false;
+        //         if (!target.isMoving) { }
+        //     }
+        // }
     }
 
     public void InitializeCharacter(CharacterData data)
@@ -432,7 +450,7 @@ public class BattleCharacter : MonoBehaviour
     {
         Debug.Log("ReduceStatusDurationsOnTurnStart for " + CharData.CharacterName);
 
-        EffectHandler.ProcessAllEffects(this);
+        EffectHandler.ProcessAllPeriodicEffects(this);
         if (CurrentState == CharacterState.Stunned)
         {
             TurnOrderManager.Instance.CharacterTurnComplete(this);
@@ -452,20 +470,16 @@ public class BattleCharacter : MonoBehaviour
 
     public void UseSingleTargetAbility(BattleCharacter target, Ability ability)
     {
-        Debug.Log(CharData.CharacterName + " is using this ability: " + ability.AbilityData.abilityName);
-        if (ability.AbilityData.abilityTypes.Contains(AbilityType.SwapPositions))
-        {
-            BattlePosition casterPosition = BattlePosition;
-            BattlePosition targetPosition = target.BattlePosition;
+        Debug.Log(CharData.CharacterName + " is using this ability: " + ability.AbilityData.abilityName + " on " + target.CharData.CharacterName);
 
-            BattleCharacter occupyingCharacter = targetPosition.GetOccupyingBattleCharacter();
-
-            occupyingCharacter.BattlePosition = casterPosition;
-            casterPosition.SetOccupyingCharacter(occupyingCharacter);
-
-            targetPosition.SetOccupyingCharacter(this);
-            BattlePosition = targetPosition;
-        }
+        ability.ExecuteAbility(this, target);
+        // if (ability.AbilityData.abilityTypes.Contains(AbilityType.SwapPositions))
+        // {
+        //     Debug.Log("Requesting swap");
+        //     this.BattlePosition.HideActiveCharacterIndicator();
+        //     // OnSwapPositionsRequested.Invoke(this, target);
+        //     OnSwapPositionsRequested(this, ability.AbilityData.effects)
+        // }
     }
 
     public void UseAbility(List<BattleCharacter> targets, Ability ability)
@@ -473,31 +487,24 @@ public class BattleCharacter : MonoBehaviour
         Debug.Log(CharData.CharacterName + " is using this ability: " + ability.AbilityData.abilityName);
         foreach (var target in targets)
         {
-            Debug.Log("Target: " + target.CharData.CharacterName);
-        }
-        foreach (var target in targets)
-        {
-            if (target.CurrentState == CharacterState.Unconscious && ability.AbilityData.abilityTypes.Contains(AbilityType.Revive))
+            if (target.CurrentState == CharacterState.Unconscious)
             {
-                target.Revive();
+                if (ability.AbilityData.abilityTypes.Contains(AbilityType.Revive))
+                {
+                    target.Revive();
+                }
             }
-            else if (target.CurrentState != CharacterState.Unconscious && !ability.AbilityData.abilityTypes.Contains(AbilityType.MoveSelf))
+            else if (!ability.AbilityData.abilityTypes.Contains(AbilityType.MoveSelf))
             {
                 ability.ExecuteAbility(this, target);
             }
-            // else if (ability.AbilityData.abilityTypes.Contains(AbilityType.SwapPositions))
-            // {
-            //     BattlePosition casterPosition = BattlePosition;
-            //     BattlePosition targetPosition = target.BattlePosition;
-
-            //     BattleCharacter occupyingCharacter = targetPosition.GetOccupyingBattleCharacter();
-
-            //     occupyingCharacter.BattlePosition = casterPosition;
-            //     casterPosition.SetOccupyingCharacter(occupyingCharacter);
-
-            //     targetPosition.SetOccupyingCharacter(this);
-            //     BattlePosition = targetPosition;
-            // }
+            else if (ability.AbilityData.abilityTypes.Contains(AbilityType.MoveSelf))
+            {
+                // get the distance that character will move forward.
+                // get reference of the ally character that is in the position that the character will move to.
+                // swap the positions of the characters.
+                // then call ability.ExecuteAbility(this, target);
+            }
         }
     }
 

@@ -109,6 +109,22 @@ public class CharacterData
         set { _formationPosition = value; }
     }
 
+    [SerializeField]
+    private int forwardMovement;
+    public int ForwardMovement
+    {
+        get { return forwardMovement; }
+        set { forwardMovement = value; }
+    }
+
+    [SerializeField]
+    private int backwardMovement;
+    public int BackwardMovement
+    {
+        get { return backwardMovement; }
+        set { backwardMovement = value; }
+    }
+
     public CharacterData(CharacterData data)
     {
         CharacterName = data.CharacterName;
@@ -123,6 +139,8 @@ public class CharacterData
         CharacterSprite = data.CharacterSprite;
         CharacterPortrait = data.CharacterPortrait;
         Abilities = data.Abilities;
+        ForwardMovement = data.forwardMovement;
+        BackwardMovement = data.backwardMovement;
     }
 
     public CharacterData(CharacterDataSO data)
@@ -138,15 +156,17 @@ public class CharacterData
         SpriteColor = data.spriteColor;
         CharacterSprite = data.characterSprite;
         CharacterPortrait = data.characterPortrait;
+        ForwardMovement = data.forwardMovement;
+        BackwardMovement = data.backwardMovement;
         Abilities = ConvertAbilitiesToInstances(data.abilityList);
     }
 
-    private List<Ability> ConvertAbilitiesToInstances(List<AbilityData> abiltiies)
+    private List<Ability> ConvertAbilitiesToInstances(List<AbilityData> abilities)
     {
         List<Ability> abilityInstances = new List<Ability>();
-        foreach (var currentAbility in abiltiies)
+        foreach (var currentAbility in abilities)
         {
-            Ability instance = new Ability { AbilityData = currentAbility, CooldownTimer = 0f };
+            Ability instance = new Ability(currentAbility) { CooldownTimer = 0f };
             abilityInstances.Add(instance);
         }
         return abilityInstances;

@@ -6,5 +6,4 @@ using UnityEngine;
 public class MoveTargetEffectData : StatusEffectData
 {
     public int moveDistance;
-    public MoveDirection moveDirection;
 }

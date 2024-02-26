@@ -1,5 +1,6 @@
 public enum TargetFaction
 {
     Allies,
-    Enemies
+    Enemies,
+    All
 }

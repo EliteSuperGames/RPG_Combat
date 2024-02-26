@@ -152,6 +152,7 @@ public static class TargetSelectionHandler
             targets.Add(target);
             if (targets.Contains(target))
             {
+                activeCharacter.BattlePosition.HideActiveCharacterIndicator();
                 activeCharacter.UseSingleTargetAbility(target, SelectedAbility);
                 currentBattleState = BattleManagerState.ChoosingAction;
                 isHandlingTargetSelection = false;
@@ -166,6 +167,7 @@ public static class TargetSelectionHandler
 
             if (targets.Contains(target))
             {
+                activeCharacter.BattlePosition.HideActiveCharacterIndicator();
                 activeCharacter.UseAbility(targets, SelectedAbility);
                 currentBattleState = BattleManagerState.ChoosingAction;
                 isHandlingTargetSelection = false;
@@ -234,6 +236,21 @@ public static class TargetSelectionHandler
         List<BattlePosition> enemyPositions
     )
     {
+        Debug.Log("SetAbilityTargets");
+
+        int activeCharIndex = activeCharacter.BattlePosition.PositionNumber;
+        int maxForwardPosition = activeCharIndex + -activeCharacter.CharData.ForwardMovement;
+        int maxBackwardPosition = activeCharIndex + activeCharacter.CharData.BackwardMovement;
+
+        Debug.Log("character is at position: " + activeCharIndex);
+        Debug.Log("maxForwardPosition: " + maxForwardPosition);
+        Debug.Log("maxBackwardPosition: " + maxBackwardPosition);
+        foreach (var target in currentValidTargets)
+        {
+            Debug.Log(target.PositionNumber);
+        }
+
+        if (ability.AbilityData.abilityTypes.Contains(AbilityType.MoveSelf)) { }
         IEnumerable<BattlePosition> battlePositionsToProcess;
         bool showHostileColor = false;
         if (ability.AbilityData.targetFaction == TargetFaction.Allies)

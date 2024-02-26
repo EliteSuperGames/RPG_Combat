@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bb2bcba5bd8b2342854fe4b24f44476, type: 3}
-  m_Name: Skip Turn
+  m_Name: Use Item
   m_EditorClassIdentifier: 
-  abilityName: Skip Turn
+  abilityName: Use Item
   targetFaction: 0
-  launchPositions: 00000000010000000200000003000000
+  launchPositions: 
   targetingType: 0
-  landingPositions: 00000000010000000200000003000000
+  landingPositions: 
   effects: []
-  abilityDescription: Skip Turn
+  abilityDescription: 
   cooldownLength: 0
   baseAbilityPower: 0
-  abilityTypes: 04000000
+  abilityTypes: 
   onlyTargetUnconscious: 0
-  canOnlyTargetSelf: 1
+  canOnlyTargetSelf: 0

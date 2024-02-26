@@ -21,6 +21,9 @@ public class UI_ActionPanel : MonoBehaviour
     private GameObject actionButtonParent;
 
     [SerializeField]
+    private GameObject staticButtonParent;
+
+    [SerializeField]
     private GameObject characterDisplay;
 
     [SerializeField]
@@ -58,6 +61,15 @@ public class UI_ActionPanel : MonoBehaviour
 
     [SerializeField]
     private TMP_Text battleMessageText;
+
+    [SerializeField]
+    public AbilityData changePositionsAbilityData;
+
+    [SerializeField]
+    public AbilityData skipTurnAbilityData;
+
+    [SerializeField]
+    public AbilityData useItemAbilityData;
 
     private void SetEnemyCharacterData(BattleCharacter enemy, bool enemyIsTarget)
     {
@@ -156,7 +168,15 @@ public class UI_ActionPanel : MonoBehaviour
     {
         ClearActionButtons();
 
-        foreach (EligibleAbility eligibleAbility in availableAbilities)
+        // Create a new list that includes both the character's abilities and the static abilities
+        List<EligibleAbility> allAbilities = new List<EligibleAbility>(availableAbilities)
+        {
+            CreateEligibleAbility(changePositionsAbilityData),
+            CreateEligibleAbility(skipTurnAbilityData),
+            CreateEligibleAbility(useItemAbilityData)
+        };
+
+        foreach (EligibleAbility eligibleAbility in allAbilities)
         {
             CreateAbilityButton(
                 eligibleAbility.Ability,
@@ -166,17 +186,38 @@ public class UI_ActionPanel : MonoBehaviour
         }
     }
 
+    private EligibleAbility CreateEligibleAbility(AbilityData abilityData)
+    {
+        Ability ability = new Ability(abilityData);
+        return new EligibleAbility(ability) { EligibleBasedOnLandingTargets = true, EligibleBasedOnLaunchPosition = true };
+    }
+
     private void ClearActionButtons()
     {
-        foreach (Transform child in actionButtonParent.transform)
+        List<Transform> parents = new List<Transform> { actionButtonParent.transform, staticButtonParent.transform };
+
+        foreach (Transform parent in parents)
         {
-            Destroy(child.gameObject);
+            foreach (Transform child in parent)
+            {
+                Destroy(child.gameObject);
+            }
         }
     }
 
     private void CreateAbilityButton(Ability ability, bool IsEligibleBasedOnOwnPosition, bool IsEligibleBasedOnTargetPositions)
     {
-        GameObject buttonGO = Instantiate(actionButtonPrefab, actionButtonParent.transform);
+        GameObject buttonGO;
+        List<string> staticAbilities = new List<string> { "Change Positions", "Skip Turn", "Use Item" };
+        if (staticAbilities.Contains(ability.AbilityData.abilityName.ToString()))
+        {
+            buttonGO = Instantiate(actionButtonPrefab, staticButtonParent.transform);
+        }
+        else
+        {
+            buttonGO = Instantiate(actionButtonPrefab, actionButtonParent.transform);
+        }
+
         Button button = buttonGO.GetComponent<Button>();
 
         button.GetComponentInChildren<TMP_Text>().text = ability.AbilityData.abilityName.ToString();
@@ -199,9 +240,8 @@ public class UI_ActionPanel : MonoBehaviour
         {
             hoverListener.OnPointerEnterEvent += (eventData) => DisabledAbilityPointerEnter(eventData, "On Cooldown");
             hoverListener.OnPointerExitEvent += DisabledAbilityPointerExit;
-
-            // how to give the battleMessage.text a different text when this button gets hovered? I want it to say "ON COOLDOWN" or something
         }
+
         button.onClick.AddListener(() => HandleAbilityButtonClick(ability));
     }
 
@@ -215,39 +255,6 @@ public class UI_ActionPanel : MonoBehaviour
     {
         battleMessageGO.gameObject.SetActive(false);
     }
-
-    // private void NoTargetsAbilityPointerEnter(PointerEventData eventData)
-    // {
-    //     battleMessageGO.gameObject.SetActive(true);
-    //     battleMessageText.text = "On Cooldown";
-    // }
-
-    // private void NotargetsAbilityPointerExit(PointerEventData eventData)
-    // {
-    //     battleMessageGO.gameObject.SetActive(false);
-    // }
-
-    // private void CooldownAbilityPointerEnter(PointerEventData eventData)
-    // {
-    //     battleMessageGO.gameObject.SetActive(true);
-    //     battleMessageText.text = "No Target Available";
-    // }
-
-    // private void CooldownAbilityPointerExit(PointerEventData eventData)
-    // {
-    //     battleMessageGO.gameObject.SetActive(false);
-    // }
-
-    // private void DisabledAbilityPointerEnter(PointerEventData eventData)
-    // {
-    //     battleMessageGO.gameObject.SetActive(true);
-    //     battleMessageText.text = "Out Of Position";
-    // }
-
-    // private void DisabledAbilityPointerExit(PointerEventData eventData)
-    // {
-    //     battleMessageGO.gameObject.SetActive(false);
-    // }
 
     private void HandleAbilityButtonClick(Ability ability)
     {

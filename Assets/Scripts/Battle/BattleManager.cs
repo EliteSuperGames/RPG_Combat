@@ -164,18 +164,25 @@ public class BattleManager : MonoBehaviour
         set { currentValidTargets = value; }
     }
 
+    public BattleCharacter movingCharacter1;
+    public BattleCharacter movingCharacter2;
+
     void Awake()
     {
         battleUIParent.OnAbilityButtonClicked += HandleAbilityButtonClick;
+        EffectHandler.OnMoveCharacterRequest += MoveCharacter;
         AllPositions = PlayerPositions.Concat(EnemyPositions).ToList();
     }
 
     void OnDestroy()
     {
         battleUIParent.OnAbilityButtonClicked -= HandleAbilityButtonClick;
+        EffectHandler.OnMoveCharacterRequest -= MoveCharacter;
         TurnOrderManager.Instance.OnActiveCharacterChanged -= HandleTurnChange;
     }
 
+    // if this is an item, then probably need to handle it different. maybe also pass the item in as a parameter?
+    // or just have a separate method for handling items.
     private void HandleAbilityButtonClick(Ability ability)
     {
         SelectedAbility = ability;
@@ -190,7 +197,7 @@ public class BattleManager : MonoBehaviour
         battleUIParent.SetAbilityData(ability, activeCharacter);
         TargetSelectionHandler.HideAllTargetIndicators(AllPositions);
         TargetSelectionHandler.SetAbilityTargets(ability, ActiveCharacter, ref currentValidTargets, PlayerPositions, EnemyPositions);
-
+        // if the ability is an item, then the item's target faction will determine this. not implemented yet though.
         CurrentBattleState =
             (ability.AbilityData.targetFaction == TargetFaction.Enemies)
                 ? BattleManagerState.ChoosingEnemyTarget
@@ -202,6 +209,8 @@ public class BattleManager : MonoBehaviour
         Debug.Log("HandleTurnChange");
         Debug.Log(newActiveCharacter.CharData.CharacterName);
         Debug.Log(newActiveCharacter.CharData.Abilities.Count);
+        Debug.Log("Current Active Character: " + ActiveCharacter?.CharData.CharacterName);
+
         // Debug.LogError("HandleTurnChange: " + newActiveCharacter.CharData.CharacterName);
         // Debug.LogError("character abilities: " + newActiveCharacter.CharData.Abilities.Count);
         // Debug.LogError("First ability: " + newActiveCharacter.CharData.Abilities[0].AbilityData.abilityName);
@@ -383,10 +392,17 @@ public class BattleManager : MonoBehaviour
         isHandlingTargetSelection = false;
     }
 
-    private void MoveCharacter(BattleCharacter character, BattlePosition newPosition)
+    private void MoveCharacter(BattleCharacter character, int positionsToMove)
     {
-        character.BattlePosition.SetOccupyingCharacter(null);
-        character.BattlePosition = newPosition;
-        newPosition.SetOccupyingCharacter(character);
+        List<BattleCharacter> battleCharacters = character.PlayerCharacter ? PlayerBattleCharacters : EnemyBattleCharacters;
+        CharacterMovementHandler.Instance.MoveCharacter(character, positionsToMove, battleCharacters);
+        // character.BattlePosition.SetOccupyingCharacter(null);
+        // character.BattlePosition = newPosition;
+        // newPosition.SetOccupyingCharacter(character);
+    }
+
+    private BattlePosition GetBattlePosition(int index, TargetFaction targetFaction)
+    {
+        return targetFaction == TargetFaction.Allies ? playerPositions[index] : enemyPositions[index];
     }
 }

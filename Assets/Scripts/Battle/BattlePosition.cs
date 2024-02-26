@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public class BattlePosition : MonoBehaviour
@@ -44,6 +45,13 @@ public class BattlePosition : MonoBehaviour
 
     public bool IsTargetable { get; set; }
 
+    public void RemoveOccupyingCharacter()
+    {
+        battleCharacter.transform.SetParent(null);
+        battleCharacter.SetCurrentBattlePosition(null);
+        battleCharacter = null;
+    }
+
     public void SetOccupyingCharacter(BattleCharacter character)
     {
         battleCharacter = character;
@@ -72,13 +80,14 @@ public class BattlePosition : MonoBehaviour
     public void EnableActiveCharacterIndicator()
     {
         activeCharacterIndicator.gameObject.SetActive(true);
-        IsTargetable = true;
+        // IsTargetable = true;
     }
 
     public void HideActiveCharacterIndicator()
     {
+        Debug.Log("Hiding active character indicator for: " + battleCharacter.CharData.CharacterName);
         activeCharacterIndicator.gameObject.SetActive(false);
-        IsTargetable = false;
+        // IsTargetable = dfalse;
     }
 
     public void EnableTargetableIndicator(bool showHostileColor)
