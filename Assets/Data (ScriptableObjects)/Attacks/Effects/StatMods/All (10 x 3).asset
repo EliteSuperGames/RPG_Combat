@@ -16,8 +16,10 @@ MonoBehaviour:
   effectName: +10 all stats
   effectDuration: -1
   effectApplicationType: 1
+  applicationUrgency: 1
   effectDescription: +10 all stats x 3
   effectPolarity: 0
+  effectType: 3
   statModifier:
     modifierName: +10 all stats
     magicPowerMod: 10

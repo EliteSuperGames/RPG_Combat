@@ -52,12 +52,15 @@ public class BattlePosition : MonoBehaviour
         battleCharacter = null;
     }
 
-    public void SetOccupyingCharacter(BattleCharacter character)
+    public void SetOccupyingCharacter(BattleCharacter character, bool setPosition)
     {
         battleCharacter = character;
         character.SetCurrentBattlePosition(this);
         character.transform.SetParent(transform);
-        character.transform.position = transform.position;
+        if (setPosition)
+        {
+            character.transform.position = transform.position;
+        }
         healthBar.gameObject.SetActive(true);
         character.RefreshHealthbar();
     }

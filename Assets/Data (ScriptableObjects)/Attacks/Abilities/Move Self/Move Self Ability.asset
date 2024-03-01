@@ -17,10 +17,10 @@ MonoBehaviour:
   launchPositions: 00000000010000000200000003000000
   targetingType: 0
   landingPositions: 
-  effects: []
+  effects:
+  - {fileID: 11400000, guid: 6a912a91c397747418f619311d998502, type: 2}
   abilityDescription: 
   cooldownLength: 0
   baseAbilityPower: 0
-  abilityTypes: 07000000
   onlyTargetUnconscious: 0
   canOnlyTargetSelf: 0

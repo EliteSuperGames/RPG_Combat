@@ -16,7 +16,8 @@ MonoBehaviour:
   effectName: Knockback 1 - 100%
   effectDuration: 0
   effectApplicationType: 0
+  applicationUrgency: 1
   effectDescription: Knocks target back 1 space
   effectPolarity: 1
+  effectType: 8
   moveDistance: 1
-  moveDirection: 1

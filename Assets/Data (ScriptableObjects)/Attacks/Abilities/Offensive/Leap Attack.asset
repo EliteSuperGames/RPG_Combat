@@ -20,10 +20,9 @@ MonoBehaviour:
   effects:
   - {fileID: 11400000, guid: 8520f4375351c994cab650836e26736c, type: 2}
   - {fileID: 11400000, guid: b7620982dd2c8c44d81087f128445342, type: 2}
-  - {fileID: 11400000, guid: bdf46536d55c9d94e9897c3341d46d20, type: 2}
+  - {fileID: 11400000, guid: 6a912a91c397747418f619311d998502, type: 2}
   abilityDescription: Leaping attack. Moves to the front position.
   cooldownLength: 2
   baseAbilityPower: 5
-  abilityTypes: 00000000010000000700000008000000
   onlyTargetUnconscious: 0
   canOnlyTargetSelf: 0

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -186,6 +187,7 @@ public class BattleCharacter : MonoBehaviour
 
     public void SetCurrentBattlePosition(BattlePosition position)
     {
+        Debug.Log("SetCurrentBattlePosition for " + CharData.CharacterName + " to " + position.PositionNumber);
         BattlePosition = position;
         FormationPosition = position.PositionNumber;
     }
@@ -471,15 +473,7 @@ public class BattleCharacter : MonoBehaviour
     public void UseSingleTargetAbility(BattleCharacter target, Ability ability)
     {
         Debug.Log(CharData.CharacterName + " is using this ability: " + ability.AbilityData.abilityName + " on " + target.CharData.CharacterName);
-
         ability.ExecuteAbility(this, target);
-        // if (ability.AbilityData.abilityTypes.Contains(AbilityType.SwapPositions))
-        // {
-        //     Debug.Log("Requesting swap");
-        //     this.BattlePosition.HideActiveCharacterIndicator();
-        //     // OnSwapPositionsRequested.Invoke(this, target);
-        //     OnSwapPositionsRequested(this, ability.AbilityData.effects)
-        // }
     }
 
     public void UseAbility(List<BattleCharacter> targets, Ability ability)
@@ -489,17 +483,18 @@ public class BattleCharacter : MonoBehaviour
         {
             if (target.CurrentState == CharacterState.Unconscious)
             {
-                if (ability.AbilityData.abilityTypes.Contains(AbilityType.Revive))
+                if (ability.AbilityData.effects.Any(effect => effect.effectType == EffectType.Revive))
                 {
                     target.Revive();
                 }
             }
-            else if (!ability.AbilityData.abilityTypes.Contains(AbilityType.MoveSelf))
+            else if (!ability.AbilityData.effects.Any(effect => effect.effectType == EffectType.MoveSelf))
             {
                 ability.ExecuteAbility(this, target);
             }
-            else if (ability.AbilityData.abilityTypes.Contains(AbilityType.MoveSelf))
+            else if (ability.AbilityData.effects.Any(effect => effect.effectType == EffectType.MoveSelf))
             {
+                Debug.Log("battleCharacter ability has a moveself effect");
                 // get the distance that character will move forward.
                 // get reference of the ally character that is in the position that the character will move to.
                 // swap the positions of the characters.

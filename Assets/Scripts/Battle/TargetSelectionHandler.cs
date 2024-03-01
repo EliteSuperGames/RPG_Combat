@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,6 +6,8 @@ using UnityEngine;
 
 public static class TargetSelectionHandler
 {
+    public static event Action<List<BattlePosition>> OnActiveTargetsFound = delegate { };
+
     public static List<EligibleAbility> DetermineAvailableAbilitiesBasedOnPosition(
         BattleCharacter battleCharacter,
         List<BattlePosition> playerPositions,
@@ -86,6 +89,7 @@ public static class TargetSelectionHandler
     }
 
     public static void OnTargetHover(
+        List<BattlePosition> currentValidTargets,
         BattleCharacter hoverTarget,
         bool isAlly,
         ref BattleCharacter activeTarget,
@@ -97,6 +101,7 @@ public static class TargetSelectionHandler
         Ability SelectedAbility
     )
     {
+        Debug.Log("OnTargetHover: " + SelectedAbility.AbilityData.abilityName);
         if (activeTarget != null)
         {
             activeTarget.BattlePosition.HideTransparentTarget();
@@ -115,13 +120,27 @@ public static class TargetSelectionHandler
         activeTarget = hoverTarget;
 
         battleUIParent.SetTargetCharacterData(activeCharacter, activeTarget);
-        if (SelectedAbility.AbilityData.landingPositions.Contains(hoverTarget.BattlePosition.PositionNumber))
+
+        // if it is a moveSelf ability, show the transparent target indicator
+        // if (SelectedAbility.AbilityData.effects.Any(effect => effect.effectType == EffectType.MoveSelf))
+        // {
+        //     foreach (var position in positionList)
+        //     {
+        //         if (currentValidTargets.Contains(position) && position.PositionNumber == activeTarget.BattlePosition.PositionNumber)
+        //         {
+        //             position.EnableTransparentTarget(!isAlly);
+        //         }
+        //     }
+        //     return;
+        // }
+        // else
+        if (currentValidTargets.Contains(hoverTarget.BattlePosition))
         {
             if (SelectedAbility.AbilityData.targetingType == TargetingType.Multiple)
             {
                 foreach (var position in positionList)
                 {
-                    if (SelectedAbility.AbilityData.landingPositions.Contains(position.PositionNumber))
+                    if (currentValidTargets.Contains(position))
                     {
                         position.EnableTransparentTarget(!isAlly);
                     }
@@ -241,46 +260,86 @@ public static class TargetSelectionHandler
         int activeCharIndex = activeCharacter.BattlePosition.PositionNumber;
         int maxForwardPosition = activeCharIndex + -activeCharacter.CharData.ForwardMovement;
         int maxBackwardPosition = activeCharIndex + activeCharacter.CharData.BackwardMovement;
+        IEnumerable<BattlePosition> battlePositionsToProcess;
+
+        bool showHostileColor = false;
 
         Debug.Log("character is at position: " + activeCharIndex);
         Debug.Log("maxForwardPosition: " + maxForwardPosition);
         Debug.Log("maxBackwardPosition: " + maxBackwardPosition);
-        foreach (var target in currentValidTargets)
-        {
-            Debug.Log(target.PositionNumber);
-        }
 
-        if (ability.AbilityData.abilityTypes.Contains(AbilityType.MoveSelf)) { }
-        IEnumerable<BattlePosition> battlePositionsToProcess;
-        bool showHostileColor = false;
-        if (ability.AbilityData.targetFaction == TargetFaction.Allies)
+        // check if the ability has a move self effect
+        foreach (var effect in ability.AbilityData.effects)
         {
-            battlePositionsToProcess = activeCharacter.PlayerCharacter ? playerPositions : enemyPositions;
+            Debug.Log("effect Name: " + effect.effectName);
+            Debug.Log("effect type: " + effect.effectType);
+        }
+        if (ability.AbilityData.abilityName == "Change Positions")
+        {
+            Debug.Log("has move self effect");
+            currentValidTargets = new List<BattlePosition>();
+
+            // Assume characterCurrentPosition is the current position of the character
+            int characterCurrentPosition = activeCharacter.BattlePosition.PositionNumber;
+
+            // Assume forwardMovement and backwardMovement are the character's movement capabilities
+            int forwardMovement = activeCharacter.CharData.ForwardMovement;
+            int backwardMovement = activeCharacter.CharData.BackwardMovement;
+
+            // Calculate the range of valid positions
+            int forwardPosition = Math.Max(0, characterCurrentPosition - forwardMovement);
+            int backwardPosition = Math.Min(3, characterCurrentPosition + backwardMovement);
+
+            Debug.Log("forwardPosition: " + forwardPosition);
+            Debug.Log("backwardPosition: " + backwardPosition);
+            Debug.Log("forwardMovement: " + forwardMovement);
+            Debug.Log("backwardMovement: " + backwardMovement);
+
+            // Add all positions in the range to currentValidTargets
+            for (int i = forwardPosition; i <= backwardPosition; i++)
+            {
+                if (i != characterCurrentPosition)
+                {
+                    Debug.Log("adding position: " + i + " to currentValidTargets");
+                    BattlePosition validPosition = GetPlayerPositionByNumber(activeCharacter.PlayerCharacter ? playerPositions : enemyPositions, i);
+                    validPosition.EnableTargetableIndicator(showHostileColor); // Add this line
+                    currentValidTargets.Add(validPosition);
+                }
+            }
+            OnActiveTargetsFound?.Invoke(currentValidTargets);
         }
         else
         {
-            showHostileColor = true;
-            battlePositionsToProcess = activeCharacter.PlayerCharacter ? enemyPositions : playerPositions;
-        }
-
-        currentValidTargets = new List<BattlePosition>();
-        foreach (var pos in ability.AbilityData.landingPositions)
-        {
-            // Debug.Log(pos);
-
-            if (ability.AbilityData.onlyTargetUnconscious)
+            if (ability.AbilityData.targetFaction == TargetFaction.Allies)
             {
-                if (battlePositionsToProcess.ElementAt(pos).GetOccupyingBattleCharacter().CurrentState == CharacterState.Unconscious)
+                battlePositionsToProcess = activeCharacter.PlayerCharacter ? playerPositions : enemyPositions;
+            }
+            else
+            {
+                showHostileColor = true;
+                battlePositionsToProcess = activeCharacter.PlayerCharacter ? enemyPositions : playerPositions;
+            }
+
+            currentValidTargets = new List<BattlePosition>();
+            foreach (var pos in ability.AbilityData.landingPositions)
+            {
+                // Debug.Log(pos);
+
+                if (ability.AbilityData.onlyTargetUnconscious)
+                {
+                    if (battlePositionsToProcess.ElementAt(pos).GetOccupyingBattleCharacter().CurrentState == CharacterState.Unconscious)
+                    {
+                        battlePositionsToProcess.ElementAt(pos).EnableTargetableIndicator(showHostileColor);
+                        currentValidTargets.Add(battlePositionsToProcess.ElementAt(pos));
+                    }
+                    continue;
+                }
+                if (battlePositionsToProcess.ElementAt(pos).GetOccupyingBattleCharacter().CurrentState != CharacterState.Unconscious)
                 {
                     battlePositionsToProcess.ElementAt(pos).EnableTargetableIndicator(showHostileColor);
                     currentValidTargets.Add(battlePositionsToProcess.ElementAt(pos));
                 }
-                continue;
-            }
-            if (battlePositionsToProcess.ElementAt(pos).GetOccupyingBattleCharacter().CurrentState != CharacterState.Unconscious)
-            {
-                battlePositionsToProcess.ElementAt(pos).EnableTargetableIndicator(showHostileColor);
-                currentValidTargets.Add(battlePositionsToProcess.ElementAt(pos));
+                OnActiveTargetsFound?.Invoke(currentValidTargets);
             }
         }
     }

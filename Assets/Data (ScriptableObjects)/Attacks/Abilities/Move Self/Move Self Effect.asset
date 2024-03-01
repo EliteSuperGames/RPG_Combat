@@ -19,4 +19,5 @@ MonoBehaviour:
   applicationUrgency: 1
   effectDescription: Move Self
   effectPolarity: 0
-  moveDistance: 0
+  effectType: 7
+  moveDistance: 3

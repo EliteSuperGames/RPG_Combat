@@ -7,11 +7,11 @@ using UnityEngine;
 public class TurnOrderManager : MonoBehaviour
 {
     [SerializeField]
-    private List<BattleCharacter> currentTurnOrder = new List<BattleCharacter>();
-    private List<BattleCharacter> completedTurnCharacters = new List<BattleCharacter>();
+    private List<BattleCharacter> currentTurnOrder = new();
+    private List<BattleCharacter> completedTurnCharacters = new();
 
     [SerializeField]
-    private List<BattleCharacter> masterCharacterList = new List<BattleCharacter>();
+    private List<BattleCharacter> masterCharacterList = new();
 
     public static TurnOrderManager Instance { get; private set; }
 

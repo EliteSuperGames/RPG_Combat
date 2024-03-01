@@ -38,8 +38,8 @@ public class AbilityData : ScriptableObject
     /// <summary>
     /// Not sure this is needed anymore
     /// </summary>
-    [Space(15)]
-    public List<AbilityType> abilityTypes = new List<AbilityType>();
+    // [Space(15)]
+    // public List<AbilityType> abilityTypes = new List<AbilityType>();
 
     [Space(15)]
     public bool onlyTargetUnconscious = false;

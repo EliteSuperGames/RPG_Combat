@@ -109,6 +109,8 @@ public class BattleManager : MonoBehaviour
         set { HandleStateChange(value); }
     }
 
+    private List<BattleCharacter> activeTargets = new List<BattleCharacter>();
+
     private void HandleStateChange(BattleManagerState value)
     {
         Debug.Log("HandleStateChange");
@@ -170,14 +172,17 @@ public class BattleManager : MonoBehaviour
     void Awake()
     {
         battleUIParent.OnAbilityButtonClicked += HandleAbilityButtonClick;
-        EffectHandler.OnMoveCharacterRequest += MoveCharacter;
+        EffectHandler.OnMoveCharacterRequest += BMMoveCharacter;
+
         AllPositions = PlayerPositions.Concat(EnemyPositions).ToList();
+        // subscribe to TargetSelectionHandler.OnActiveTargetsFound, and set CurrentValidTargets with the data
+        TargetSelectionHandler.OnActiveTargetsFound += (List<BattlePosition> validTargets) => CurrentValidTargets = validTargets;
     }
 
     void OnDestroy()
     {
         battleUIParent.OnAbilityButtonClicked -= HandleAbilityButtonClick;
-        EffectHandler.OnMoveCharacterRequest -= MoveCharacter;
+        EffectHandler.OnMoveCharacterRequest -= BMMoveCharacter;
         TurnOrderManager.Instance.OnActiveCharacterChanged -= HandleTurnChange;
     }
 
@@ -187,7 +192,7 @@ public class BattleManager : MonoBehaviour
     {
         SelectedAbility = ability;
         Debug.Log(selectedAbility.AbilityData.abilityName);
-        if (ability.AbilityData.abilityTypes.Contains(AbilityType.SkipTurn))
+        if (ability.AbilityData.effects.Any(effect => effect.effectType == EffectType.SkipTurn))
         {
             battleUIParent.ClearCharacterData();
             TurnOrderManager.Instance.CharacterTurnComplete(ActiveCharacter);
@@ -248,12 +253,12 @@ public class BattleManager : MonoBehaviour
         TurnOrderManager.Instance.OnActiveCharacterChanged -= HandleTurnChange;
         foreach (BattleCharacter character in PlayerBattleCharacters)
         {
-            character.BattlePosition.SetOccupyingCharacter(null);
+            // character.BattlePosition.SetOccupyingCharacter(null);
             Destroy(character.gameObject);
         }
         foreach (BattleCharacter character in EnemyBattleCharacters)
         {
-            character.BattlePosition.SetOccupyingCharacter(null);
+            // character.BattlePosition.SetOccupyingCharacter(null);
             Destroy(character.gameObject);
         }
         PlayerBattleCharacters.Clear();
@@ -292,13 +297,13 @@ public class BattleManager : MonoBehaviour
             if (character.PlayerCharacter)
             {
                 BattlePosition desiredPosition = TargetSelectionHandler.GetPlayerPositionByNumber(PlayerPositions, battleCharacter.FormationPosition);
-                desiredPosition.SetOccupyingCharacter(battleCharacter);
+                desiredPosition.SetOccupyingCharacter(battleCharacter, true);
                 PlayerBattleCharacters.Add(battleCharacter);
             }
             else
             {
                 BattlePosition desiredPosition = TargetSelectionHandler.GetPlayerPositionByNumber(EnemyPositions, battleCharacter.FormationPosition);
-                desiredPosition.SetOccupyingCharacter(battleCharacter);
+                desiredPosition.SetOccupyingCharacter(battleCharacter, true);
                 EnemyBattleCharacters.Add(battleCharacter);
             }
         }
@@ -366,6 +371,7 @@ public class BattleManager : MonoBehaviour
                     else
                     {
                         TargetSelectionHandler.OnTargetHover(
+                            currentValidTargets,
                             targetCharacter,
                             targetingSameFaction,
                             ref activeTarget,
@@ -392,10 +398,12 @@ public class BattleManager : MonoBehaviour
         isHandlingTargetSelection = false;
     }
 
-    private void MoveCharacter(BattleCharacter character, int positionsToMove)
+    private void BMMoveCharacter(BattleCharacter caster, BattleCharacter target)
     {
-        List<BattleCharacter> battleCharacters = character.PlayerCharacter ? PlayerBattleCharacters : EnemyBattleCharacters;
-        CharacterMovementHandler.Instance.MoveCharacter(character, positionsToMove, battleCharacters);
+        Debug.Log("BMMoveCharacter in BattleManager");
+        List<BattleCharacter> battleCharacters = caster.PlayerCharacter ? PlayerBattleCharacters : EnemyBattleCharacters;
+        List<BattlePosition> battlePositions = caster.PlayerCharacter ? PlayerPositions : EnemyPositions;
+        CharacterMovementHandler.Instance.MoveCharacter(caster, target, battleCharacters, battlePositions);
         // character.BattlePosition.SetOccupyingCharacter(null);
         // character.BattlePosition = newPosition;
         // newPosition.SetOccupyingCharacter(character);

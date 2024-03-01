@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static class EffectHandler
 {
-    public static event Action<BattleCharacter, int> OnMoveCharacterRequest = delegate { };
+    public static event Action<BattleCharacter, BattleCharacter> OnMoveCharacterRequest = delegate { };
 
     /// <summary>
     /// If the target already has a stun or stat modifier applied, it will just refresh the duration (if the new effect's duration is longer than the existing)
@@ -22,6 +22,7 @@ public static class EffectHandler
             Debug.Log("Failed to apply status");
             return;
         }
+
         if (effectData is StunEffectData)
         {
             if (existingEffect != null)
@@ -55,11 +56,12 @@ public static class EffectHandler
         else if (effectData is MoveSelfEffectData moveSelfEffectData)
         {
             Debug.Log("invoking OnMoveCharacterRequest");
-            OnMoveCharacterRequest?.Invoke(target, moveSelfEffectData.moveDistance);
+
+            // OnMoveCharacterRequest?.Invoke(caster, target);
         }
         else if (effectData is MoveTargetEffectData moveTargetEffectData)
         {
-            OnMoveCharacterRequest?.Invoke(target, moveTargetEffectData.moveDistance);
+            // OnMoveCharacterRequest?.Invoke(caster, target);
         }
         else
         {
@@ -72,6 +74,11 @@ public static class EffectHandler
         float successChance = effectData.effectChance;
         float randomNum = UnityEngine.Random.Range(1, 101);
         return randomNum <= successChance;
+    }
+
+    public static void RequestMove(BattleCharacter caster, BattleCharacter target)
+    {
+        OnMoveCharacterRequest?.Invoke(caster, target);
     }
 
     private static void RefreshSameStatus(EffectInstance existingEffectInstance, StatusEffectData effectData)
@@ -110,12 +117,12 @@ public static class EffectHandler
             case StatModifierEffectData statModEffect:
                 // ApplyStatModifier(character, statModEffect, effectInstance);
                 break;
-            case MoveSelfEffectData moveSelfEffect:
-                OnMoveCharacterRequest(character, moveSelfEffect.moveDistance);
-                break;
-            case MoveTargetEffectData moveTargetEffect:
-                OnMoveCharacterRequest(character, moveTargetEffect.moveDistance);
-                break;
+            // case MoveSelfEffectData moveSelfEffect:
+            //     OnMoveCharacterRequest(character, moveSelfEffect.moveDistance);
+            //     break;
+            // case MoveTargetEffectData moveTargetEffect:
+            //     OnMoveCharacterRequest(character, moveTargetEffect.moveDistance);
+            //     break;
         }
     }
 

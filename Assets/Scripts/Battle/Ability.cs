@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
@@ -32,28 +34,30 @@ public class Ability
     /// <param name="target">The character being targeted by the ability.</param>
     public void ExecuteAbility(BattleCharacter caster, BattleCharacter target)
     {
+        Debug.Log("EXECUTE ABILITY" + AbilityData.abilityName);
         // MoveCharacter(caster, target);
         ApplyDamage(caster, target);
         ApplyEffects(caster, target);
         ApplyHealing(caster, target);
         MoveSelf(caster);
-        MoveTarget(target);
+        // MoveSelf(caster);
+        // MoveTarget(target);
     }
 
     private void MoveSelf(BattleCharacter caster)
     {
-        Debug.Log("MoveSEelf blokkc");
-        // if (AbilityData.abilityTypes.Contains(AbilityType.MoveSelf))
-        // {
-        //     EffectHandler.AddEffectToCharacter(caster, caster, AbilityData.effects[0]);
-        // }
+        // probably need to pass in the list of characters on the same faction so you can moveself to them
+        Debug.Log("Ability.MoveSelf");
+
         if (AbilityData.effects.Count > 0)
         {
             foreach (var effect in AbilityData.effects)
             {
+                Debug.Log("Effect: " + effect.effectName);
                 if (effect is MoveSelfEffectData)
                 {
-                    EffectHandler.AddInitialEffectToCharacter(caster, caster, effect);
+                    Debug.Log("calling EffectHandler.AddInitialEffectToCharacter");
+                    // EffectHandler.AddInitialEffectToCharacter(caster, caster, effect);
                 }
             }
         }
@@ -80,6 +84,10 @@ public class Ability
     /// <param name="target">The character being targeted by the ability.</param>
     private void ApplyEffects(BattleCharacter caster, BattleCharacter target)
     {
+        if (AbilityData.abilityName == "Change Positions")
+        {
+            EffectHandler.RequestMove(caster, target);
+        }
         if (AbilityData.effects.Count > 0)
         {
             foreach (var effect in AbilityData.effects)
@@ -91,15 +99,19 @@ public class Ability
 
     private void ApplyHealing(BattleCharacter caster, BattleCharacter target)
     {
-        if (AbilityData.abilityTypes.Contains(AbilityType.Heal))
+        if (AbilityData.effects.Any(effect => effect.effectType == EffectType.HealOverTime))
         {
             target.RestoreHealth(AbilityData.baseAbilityPower);
         }
+        // if (AbilityData.abilityTypes.Contains(AbilityType.Heal))
+        // {
+        //     target.RestoreHealth(AbilityData.baseAbilityPower);
+        // }
     }
 
     public void ApplyDamage(BattleCharacter caster, BattleCharacter target)
     {
-        if (AbilityData.abilityTypes.Contains(AbilityType.Damage))
+        if (AbilityData.effects.Any(effect => effect.effectType == EffectType.DamageOverTime))
         {
             int damageAmount;
             if (AbilityData.baseAbilityPower > 0)

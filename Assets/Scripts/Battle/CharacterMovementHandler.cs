@@ -8,7 +8,7 @@ public class CharacterMovementHandler : MonoBehaviour
 {
     public static CharacterMovementHandler Instance { get; private set; }
 
-    public List<BattleCharacter> allCharacters = new List<BattleCharacter>();
+    //public List<BattleCharacter> allCharacters = new List<BattleCharacter>();
     public float speed = 35.0f;
 
     private void Awake()
@@ -23,106 +23,52 @@ public class CharacterMovementHandler : MonoBehaviour
         }
     }
 
-    // public void StartSwap(BattleCharacter character1, BattleCharacter character2)
-    // {
-    //     // Debug.Log("CahracterMovementHandler StartSwap");
-    //     // Vector3 tempPosition = character1.transform.position;
-    //     // character1.targetPosition = character2.transform.position;
-    //     // character2.targetPosition = tempPosition;
+    void Update() { }
 
-    //     movingCharacter1 = character1;
-    //     movingCharacter2 = character2;
-    //     character1.isMoving = true;
-    //     character2.isMoving = true;
-    // }
-
-    void Update()
+    public IEnumerator SlideCharacter(BattleCharacter character, Vector3 targetPosition, float duration)
     {
-        if (allCharacters.Any(character => character.isMoving))
+        Vector3 initialPosition = character.transform.position;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
         {
-            // Start the SwapCharacters coroutine
-            StartCoroutine(SwapCharacters(allCharacters, 0.15f));
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
 
-            // Clear the isMoving flag for each character
-            foreach (BattleCharacter character in allCharacters)
-            {
-                character.isMoving = false;
-            }
-        }
-    }
+            character.transform.position = Vector3.Lerp(initialPosition, targetPosition, t);
 
-    public IEnumerator SwapCharacters(List<BattleCharacter> characters, float duration)
-    {
-        float elapsedTime = 0;
-
-        // Store the starting and target positions for each character
-        List<Vector3> startingPositions = new List<Vector3>();
-        List<Vector3> targetPositions = new List<Vector3>();
-        foreach (BattleCharacter character in characters)
-        {
-            startingPositions.Add(character.transform.position);
-            targetPositions.Add(character.BattlePosition.transform.position);
-        }
-
-        while (elapsedTime < duration)
-        {
-            // Interpolate each character's position
-            for (int i = 0; i < characters.Count; i++)
-            {
-                characters[i].transform.position = Vector3.Lerp(startingPositions[i], targetPositions[i], elapsedTime / duration);
-            }
-            elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        // Set each character's position to their target position
-        for (int i = 0; i < characters.Count; i++)
-        {
-            characters[i].transform.position = targetPositions[i];
-        }
+        character.transform.position = targetPosition;
     }
 
     public void MoveCharacter(
         BattleCharacter movingCharacter,
-        int positionsToMove,
-        List<BattleCharacter> allCharacters
-    // List<BattlePosition> battlePositions
+        BattleCharacter targetCharacter,
+        List<BattleCharacter> allCharacters,
+        List<BattlePosition> battlePositions
     )
     {
-        int currentPosition = movingCharacter.BattlePosition.PositionNumber;
-        List<BattlePosition> battlePositions = allCharacters.Select(character => character.BattlePosition).ToList();
-        int newPosition = currentPosition + positionsToMove;
+        // Find the indices of the moving character and the target character
+        int movingIndex = allCharacters.IndexOf(movingCharacter);
+        int targetIndex = allCharacters.IndexOf(targetCharacter);
 
-        newPosition = Math.Max(0, newPosition);
-        newPosition = Math.Min(newPosition, allCharacters.Count - 1);
+        // Remove the moving character from the list temporarily
+        allCharacters.RemoveAt(movingIndex);
 
-        movingCharacter.BattlePosition.RemoveOccupyingCharacter();
+        // Insert the moving character at the target index
+        allCharacters.Insert(targetIndex, movingCharacter);
 
-        if (positionsToMove > 0)
+        // Set the BattlePosition for each character in the updated list
+        for (int i = 0; i < allCharacters.Count; i++)
         {
-            for (int i = currentPosition; i < newPosition; i++)
-            {
-                allCharacters[i] = allCharacters[i + 1];
-                allCharacters[i].BattlePosition = GetBattlePosition(i, battlePositions);
-            }
-        }
-        else if (positionsToMove < 0)
-        {
-            for (int i = currentPosition; i > newPosition; i--)
-            {
-                allCharacters[i] = allCharacters[i - 1];
-                allCharacters[i].BattlePosition = GetBattlePosition(i, battlePositions);
-            }
-        }
+            BattleCharacter character = allCharacters[i];
+            BattlePosition position = GetBattlePosition(i, battlePositions);
 
-        allCharacters[newPosition] = movingCharacter;
-        movingCharacter.BattlePosition = GetBattlePosition(newPosition, battlePositions);
-
-        // After all the characters have been moved and their BattlePosition properties have been updated,
-        // call SetOccupyingCharacter for each character.
-        foreach (BattleCharacter character in allCharacters)
-        {
-            character.BattlePosition.SetOccupyingCharacter(character);
+            StartCoroutine(SlideCharacter(character, position.transform.position, 0.15f));
+            character.SetCurrentBattlePosition(position);
+            position.SetOccupyingCharacter(character, true);
         }
     }
 

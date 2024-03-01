@@ -2,7 +2,11 @@ public enum EffectType
 {
     DamageOverTime,
     LossOfTurn,
+    SkipTurn,
     HealOverTime,
     StatModifier,
-    PreventAction
+    PreventAction,
+    Revive,
+    MoveSelf,
+    MoveTarget
 }

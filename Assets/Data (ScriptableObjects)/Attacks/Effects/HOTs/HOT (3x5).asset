@@ -19,4 +19,5 @@ MonoBehaviour:
   applicationUrgency: 2
   effectDescription: Restores a small amount of health per round
   effectPolarity: 0
+  effectType: 2
   healthRestoredPerRound: 5

@@ -16,8 +16,10 @@ MonoBehaviour:
   effectName: Haste
   effectDuration: 3
   effectApplicationType: 1
+  applicationUrgency: 1
   effectDescription: Increases character's speed by 10 for 3 turns.
   effectPolarity: 0
+  effectType: 3
   statModifier:
     modifierName: Haste
     magicPowerMod: 0
