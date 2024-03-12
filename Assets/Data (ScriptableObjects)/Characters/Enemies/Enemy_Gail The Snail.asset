@@ -14,18 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Gail
   maxHealth: 50
-  speed: 6
-  physicalPower: 15
-  magicPower: 3
+  speed: 10
+  physicalPower: 10
+  magicPower: 10
   playerCharacter: 0
   battleSize: 1
-  spriteColor: {r: 1, g: 0, b: 0, a: 1}
+  spriteColor: {r: 0, g: 0, b: 0, a: 1}
   characterSprite: {fileID: -2046704090, guid: 0d8cfe44ad0dba34d847839fa3bd11ef, type: 3}
-  characterPortrait: {fileID: 21300000, guid: b3140e2a7f8567949bf5adad335cdde6, type: 3}
+  characterPortrait: {fileID: 21300000, guid: 0b50b57f2c24a5442bd90d5a9a9d3d5c, type: 3}
   abilityList:
-  - {fileID: 11400000, guid: ea7807532a4bc7a49a0a08226c3b2ba0, type: 2}
-  - {fileID: 11400000, guid: da39f9c926d817e428d34814ef5a874a, type: 2}
-  - {fileID: 11400000, guid: 7885b84c03ef6c1498e13c037f1ea6dc, type: 2}
-  - {fileID: 11400000, guid: 2cc00bc663162324f80ff10b21696125, type: 2}
-  forwardMovement: 2
-  backwardMovement: 1
+  - {fileID: 11400000, guid: c5971f88a072f60448d1f246df55d2db, type: 2}
+  - {fileID: 11400000, guid: ece3dac8cf957b6408f4a2ba2b462706, type: 2}
+  - {fileID: 11400000, guid: 221b483002f62c74c98592f1294478ce, type: 2}
+  forwardMovement: 1
+  backwardMovement: 2

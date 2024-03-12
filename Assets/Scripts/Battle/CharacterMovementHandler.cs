@@ -8,7 +8,6 @@ public class CharacterMovementHandler : MonoBehaviour
 {
     public static CharacterMovementHandler Instance { get; private set; }
 
-    //public List<BattleCharacter> allCharacters = new List<BattleCharacter>();
     public float speed = 35.0f;
 
     private void Awake()

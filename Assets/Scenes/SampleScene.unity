@@ -638,7 +638,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee0c0ae9835153f45a156dcc91e2f6de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterPrefab: {fileID: 7292990204059343074, guid: 160995a72b58e8744bae0132f611835e, type: 3}
+  characterPrefab: {fileID: 5371250921716495302, guid: d60a123cc20b6b147ba7aa4c5036bf25, type: 3}
   maxBattlePartySize: 4
   activePartyMembers: []
   inactivePartyMembers: []
@@ -1349,7 +1349,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 703844512}
-  - {fileID: 1698462144}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3104,7 +3103,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e980288e2fd56fe4092fa4506f29c87a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allCharacters: []
   speed: 1
 --- !u!1001 &1485415372
 PrefabInstance:
@@ -3803,50 +3801,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1686973870}
   m_CullTransparentMesh: 1
---- !u!1 &1698462142
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1698462144}
-  - component: {fileID: 1698462143}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1698462143
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1698462142}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e754697d565f1544981b2888239f20c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1698462144
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1698462142}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -466.52988, y: -135.45674, z: 19.883627}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 538316244}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1705891351
 GameObject:
   m_ObjectHideFlags: 0
@@ -4563,7 +4517,7 @@ MonoBehaviour:
   enemyCharacterHealth: {fileID: 873069948}
   battleMessageGO: {fileID: 32401771}
   battleMessageText: {fileID: 1354440537}
-  changePositionsAbilityData: {fileID: 11400000, guid: cae16823213080a48b7ddb0f1ef7afca, type: 2}
+  changePositionsAbilityData: {fileID: 11400000, guid: 2d5a6e7247c98cf41886fcbd45fc608d, type: 2}
   skipTurnAbilityData: {fileID: 11400000, guid: 5cddb3aa8a44c5b4ebcb3ce644454eb7, type: 2}
   useItemAbilityData: {fileID: 11400000, guid: 4f398abf76f4e014caac99061d2f5f08, type: 2}
 --- !u!1 &2013323495

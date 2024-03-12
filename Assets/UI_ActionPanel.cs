@@ -115,8 +115,6 @@ public class UI_ActionPanel : MonoBehaviour
         {
             enemyCharacterImage.sprite = null;
             enemyCharacterName.text = null;
-            // enemyCharacterImage.gameObject.SetActive(false);
-            // enemyCharacterName.gameObject.SetActive(false);
             enemyCharacterHealth.text = null;
         }
         else
@@ -209,6 +207,7 @@ public class UI_ActionPanel : MonoBehaviour
     {
         GameObject buttonGO;
         List<string> staticAbilities = new List<string> { "Change Positions", "Skip Turn", "Use Item" };
+
         if (staticAbilities.Contains(ability.AbilityData.abilityName.ToString()))
         {
             buttonGO = Instantiate(actionButtonPrefab, staticButtonParent.transform);

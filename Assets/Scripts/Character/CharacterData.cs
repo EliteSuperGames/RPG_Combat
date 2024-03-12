@@ -166,7 +166,7 @@ public class CharacterData
         List<Ability> abilityInstances = new List<Ability>();
         foreach (var currentAbility in abilities)
         {
-            Ability instance = new Ability(currentAbility) { CooldownTimer = 0f };
+            Ability instance = new Ability(currentAbility) { CooldownTimer = 0 };
             abilityInstances.Add(instance);
         }
         return abilityInstances;

@@ -172,7 +172,8 @@ public class BattleManager : MonoBehaviour
     void Awake()
     {
         battleUIParent.OnAbilityButtonClicked += HandleAbilityButtonClick;
-        EffectHandler.OnMoveCharacterRequest += BMMoveCharacter;
+        // EffectHandler.OnMoveCharacterRequest += BMMoveCharacter;
+        ChangePositionEffect.OnChangePosition += BMMoveCharacter;
 
         AllPositions = PlayerPositions.Concat(EnemyPositions).ToList();
         // subscribe to TargetSelectionHandler.OnActiveTargetsFound, and set CurrentValidTargets with the data
@@ -182,7 +183,7 @@ public class BattleManager : MonoBehaviour
     void OnDestroy()
     {
         battleUIParent.OnAbilityButtonClicked -= HandleAbilityButtonClick;
-        EffectHandler.OnMoveCharacterRequest -= BMMoveCharacter;
+        // EffectHandler.OnMoveCharacterRequest -= BMMoveCharacter;
         TurnOrderManager.Instance.OnActiveCharacterChanged -= HandleTurnChange;
     }
 
@@ -190,14 +191,15 @@ public class BattleManager : MonoBehaviour
     // or just have a separate method for handling items.
     private void HandleAbilityButtonClick(Ability ability)
     {
+        Debug.Log("HandleAbilityButtonClick");
         SelectedAbility = ability;
         Debug.Log(selectedAbility.AbilityData.abilityName);
-        if (ability.AbilityData.effects.Any(effect => effect.effectType == EffectType.SkipTurn))
-        {
-            battleUIParent.ClearCharacterData();
-            TurnOrderManager.Instance.CharacterTurnComplete(ActiveCharacter);
-            return;
-        }
+        // if (ability.AbilityData.effects.Any(effect => effect.effectType == EffectType.SkipTurn))
+        // {
+        //     battleUIParent.ClearCharacterData();
+        //     TurnOrderManager.Instance.CharacterTurnComplete(ActiveCharacter);
+        //     return;
+        // }
 
         battleUIParent.SetAbilityData(ability, activeCharacter);
         TargetSelectionHandler.HideAllTargetIndicators(AllPositions);
@@ -211,14 +213,6 @@ public class BattleManager : MonoBehaviour
 
     private void HandleTurnChange(BattleCharacter newActiveCharacter)
     {
-        Debug.Log("HandleTurnChange");
-        Debug.Log(newActiveCharacter.CharData.CharacterName);
-        Debug.Log(newActiveCharacter.CharData.Abilities.Count);
-        Debug.Log("Current Active Character: " + ActiveCharacter?.CharData.CharacterName);
-
-        // Debug.LogError("HandleTurnChange: " + newActiveCharacter.CharData.CharacterName);
-        // Debug.LogError("character abilities: " + newActiveCharacter.CharData.Abilities.Count);
-        // Debug.LogError("First ability: " + newActiveCharacter.CharData.Abilities[0].AbilityData.abilityName);
         ActiveCharacter?.BattlePosition.HideActiveCharacterIndicator();
         ActiveCharacter = newActiveCharacter;
         ActiveCharacter?.BattlePosition.EnableActiveCharacterIndicator();
@@ -239,7 +233,6 @@ public class BattleManager : MonoBehaviour
 
     void StartBattle()
     {
-        Debug.Log("StartBattle");
         List<CharacterData> allChars = new List<CharacterData>();
         allChars.AddRange(playerBaseCharacters);
         allChars.AddRange(EnemyBaseCharacters);
@@ -282,7 +275,6 @@ public class BattleManager : MonoBehaviour
 
     private List<BattleCharacter> SetBattleCharacters(List<CharacterData> characters)
     {
-        Debug.Log("SetBattleCharacters");
         PlayerBattleCharacters.Clear();
         EnemyBattleCharacters.Clear();
 
@@ -400,7 +392,6 @@ public class BattleManager : MonoBehaviour
 
     private void BMMoveCharacter(BattleCharacter caster, BattleCharacter target)
     {
-        Debug.Log("BMMoveCharacter in BattleManager");
         List<BattleCharacter> battleCharacters = caster.PlayerCharacter ? PlayerBattleCharacters : EnemyBattleCharacters;
         List<BattlePosition> battlePositions = caster.PlayerCharacter ? PlayerPositions : EnemyPositions;
         CharacterMovementHandler.Instance.MoveCharacter(caster, target, battleCharacters, battlePositions);

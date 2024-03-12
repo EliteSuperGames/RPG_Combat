@@ -35,11 +35,10 @@ public class BattleCharacter : MonoBehaviour
         private set { _currentState = value; }
     }
 
-    [SerializeField]
     [Header("Status Effects")]
-    private List<EffectInstance> _statusEffects = new List<EffectInstance>();
-
-    public List<EffectInstance> StatusEffects
+    [SerializeField]
+    private List<StatusEffect> _statusEffects = new List<StatusEffect>();
+    public List<StatusEffect> StatusEffects
     {
         get { return _statusEffects; }
         set { _statusEffects = value; }
@@ -114,21 +113,11 @@ public class BattleCharacter : MonoBehaviour
         HealthbarController = FindObjectOfType<HealthbarController>();
     }
 
-    void Update()
-    {
-        // if (isMoving)
-        // {
-        //     transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-        //     if (transform.position == targetPosition)
-        //     {
-        //         isMoving = false;
-        //         if (!target.isMoving) { }
-        //     }
-        // }
-    }
+    void Update() { }
 
     public void InitializeCharacter(CharacterData data)
     {
+        Debug.Log("InitializeCharacter");
         CharData = data;
         InitialCharacterData = new CharacterData(data);
         PlayerCharacter = data.PlayerCharacter;
@@ -168,19 +157,6 @@ public class BattleCharacter : MonoBehaviour
     #endregion
 
     #region Perform actions to others
-    public void Attack(BattleCharacter target)
-    {
-        Debug.Log(CharData.CharacterName + " is attacking: " + target.GetCharacterData().CharacterName + "!");
-        target.TakeDamage(GetAttackDamage());
-    }
-
-    public void Heal(BattleCharacter target)
-    {
-        Debug.Log(CharData.CharacterName + " is healing: " + target.GetCharacterData().CharacterName);
-
-        int healAmount = 15;
-        target.RestoreHealth(healAmount);
-    }
     #endregion
 
     #region Modify Own Stats
@@ -223,13 +199,21 @@ public class BattleCharacter : MonoBehaviour
         OnCharacterDeath?.Invoke(this);
     }
 
-    private void Revive()
+    public void Revive()
     {
         CurrentState = CharacterState.Normal;
         StartCoroutine(ReviveCoroutine());
         OnCharacterRevive?.Invoke(this);
     }
 
+    public void Defend()
+    {
+        CurrentState = CharacterState.Defend;
+    }
+
+    #endregion
+
+    #region Animations
     IEnumerator ReviveCoroutine()
     {
         Transform transform = GetComponent<Transform>();
@@ -283,14 +267,6 @@ public class BattleCharacter : MonoBehaviour
         transform.position = new Vector3(transform.position.x, startPosition.y - bounceHeight, transform.position.z);
     }
 
-    public void Defend()
-    {
-        // CurrentState = CharacterState.Defend;
-    }
-
-    #endregion
-
-    #region Animations
     IEnumerator RotateAndBounceCoroutine()
     {
         Transform transform = GetComponent<Transform>();
@@ -347,176 +323,60 @@ public class BattleCharacter : MonoBehaviour
 
     #region Status Effects
 
-    public EffectInstance GetEffectInstance(StatusEffectData effectData)
-    {
-        foreach (EffectInstance effectInstance in StatusEffects)
-        {
-            if (effectInstance.effectData == effectData)
-            {
-                return effectInstance;
-            }
-        }
-        return null;
-    }
-
-    public void ApplyStatModifier(StatModifier statModifier)
-    {
-        Debug.Log("ApplyStatModifier");
-        Debug.Log(statModifier.modifierName);
-        List<StatModifier> statModifiers;
-
-        if (statModifier.positiveOrNegative == PositiveOrNegativeMod.Positive)
-        {
-            statModifiers = PositiveStatModifiers;
-        }
-        else
-        {
-            statModifiers = NegativeStatModifiers;
-        }
-
-        if (!statModifiers.Contains(statModifier))
-        {
-            statModifiers.Add(statModifier);
-            ApplyModifierEffects(statModifier);
-        }
-    }
-
-    private void ApplyModifierEffects(StatModifier statModifier)
-    {
-        Debug.Log("ApplyModifierEffects");
-        Debug.Log(statModifier);
-        CharData.MagicPower += statModifier.magicPowerMod;
-        CharData.PhysicalPower += statModifier.physicalPowerMod;
-        Debug.Log("Speed Mod: " + statModifier.speedMod);
-        Debug.Log("Speed before mod: " + CharData.Speed);
-
-        CharData.Speed += statModifier.speedMod;
-        Debug.Log("Speed after mod: " + CharData.Speed);
-        CharData.MaxHealth += statModifier.maxHealthMod;
-
-        // Ensure that Health and MaxHealth don't go below 1 (character shouldn't die from a stat modifier)
-        CharData.Health = Mathf.Max(CharData.Health, 1);
-        CharData.MaxHealth = Mathf.Max(CharData.MaxHealth, 1);
-    }
-
-    public void RemoveStatModifierEffects(StatModifier statModEffect)
-    {
-        List<StatModifier> statModifiers;
-
-        if (statModEffect.positiveOrNegative == PositiveOrNegativeMod.Positive)
-        {
-            statModifiers = PositiveStatModifiers;
-        }
-        else
-        {
-            statModifiers = NegativeStatModifiers;
-        }
-
-        statModifiers.Remove(statModEffect);
-
-        CharData.MagicPower -= statModEffect.magicPowerMod;
-        CharData.PhysicalPower -= statModEffect.physicalPowerMod;
-        CharData.Speed -= statModEffect.speedMod;
-        CharData.MaxHealth -= statModEffect.maxHealthMod;
-        CharData.MaxHealth = Mathf.Max(CharData.MaxHealth, 1);
-        if (CharData.MagicPower > InitialCharacterData.MagicPower)
-        {
-            CharData.MagicPower = InitialCharacterData.MagicPower;
-        }
-
-        if (CharData.PhysicalPower > InitialCharacterData.PhysicalPower)
-        {
-            CharData.PhysicalPower = InitialCharacterData.PhysicalPower;
-        }
-
-        if (CharData.Speed > InitialCharacterData.Speed)
-        {
-            CharData.Speed = InitialCharacterData.Speed;
-        }
-
-        if (CharData.MaxHealth > InitialCharacterData.MaxHealth)
-        {
-            CharData.MaxHealth = InitialCharacterData.MaxHealth;
-        }
-    }
-
-    private void RemoveEffect(EffectType effectType)
-    {
-        for (int i = StatusEffects.Count - 1; i >= 0; i--)
-        {
-            var effect = StatusEffects[i];
-        }
-    }
-
     private void ProcessStatusEffectsOnTurnStart()
     {
-        Debug.Log("ReduceStatusDurationsOnTurnStart for " + CharData.CharacterName);
-
-        EffectHandler.ProcessAllPeriodicEffects(this);
-        if (CurrentState == CharacterState.Stunned)
+        int totalPoisonDamage = 0;
+        int totalFireDamage = 0;
+        int totalHealing = 0;
+        foreach (var effect in StatusEffects)
         {
-            TurnOrderManager.Instance.CharacterTurnComplete(this);
+            effect.Update();
+        }
+
+        totalPoisonDamage = StatusEffects.OfType<PoisonEffect>().Sum(effect => effect.DamagePerTurn);
+        totalFireDamage = StatusEffects.OfType<FireEffect>().Sum(effect => effect.DamagePerTurn);
+        totalHealing = StatusEffects.OfType<HealOverTimeEffect>().Sum(effect => effect.healPerTurn);
+        StatusEffects.RemoveAll(effect => effect.duration <= 0);
+
+        if (totalPoisonDamage > 0)
+        {
+            Debug.Log("Taking poison damage: " + totalPoisonDamage);
+            TakeDamage(totalPoisonDamage);
+        }
+
+        if (totalFireDamage > 0)
+        {
+            Debug.Log("Taking fire damage: " + totalFireDamage);
+            TakeDamage(totalFireDamage);
+        }
+
+        if (totalHealing > 0)
+        {
+            Debug.Log("Healing: " + totalHealing);
+            RestoreHealth(totalHealing);
         }
     }
+
+    public void AddStatusEffect(StatusEffect effect)
+    {
+        StatusEffects.Add(effect);
+    }
+
     #endregion
 
     #region Getters
-    private int GetAttackDamage()
-    {
-        return CharData.PhysicalPower;
-    }
 
-    #endregion
+    #endregion Getters
 
     #region Abilities
-
-    public void UseSingleTargetAbility(BattleCharacter target, Ability ability)
-    {
-        Debug.Log(CharData.CharacterName + " is using this ability: " + ability.AbilityData.abilityName + " on " + target.CharData.CharacterName);
-        ability.ExecuteAbility(this, target);
-    }
 
     public void UseAbility(List<BattleCharacter> targets, Ability ability)
     {
         Debug.Log(CharData.CharacterName + " is using this ability: " + ability.AbilityData.abilityName);
-        foreach (var target in targets)
-        {
-            if (target.CurrentState == CharacterState.Unconscious)
-            {
-                if (ability.AbilityData.effects.Any(effect => effect.effectType == EffectType.Revive))
-                {
-                    target.Revive();
-                }
-            }
-            else if (!ability.AbilityData.effects.Any(effect => effect.effectType == EffectType.MoveSelf))
-            {
-                ability.ExecuteAbility(this, target);
-            }
-            else if (ability.AbilityData.effects.Any(effect => effect.effectType == EffectType.MoveSelf))
-            {
-                Debug.Log("battleCharacter ability has a moveself effect");
-                // get the distance that character will move forward.
-                // get reference of the ally character that is in the position that the character will move to.
-                // swap the positions of the characters.
-                // then call ability.ExecuteAbility(this, target);
-            }
-        }
+        ability.Use(this, targets);
     }
 
-    public void AddStatusEffect(BattleCharacter caster, StatusEffectData effectToAdd, int damagePerRound = 0)
-    {
-        EffectInstance instance = new EffectInstance()
-        {
-            effectData = effectToAdd,
-            remainingDuration = effectToAdd.effectDuration,
-            characterAppliedTo = CharData.CharacterName,
-            characterApplying = caster.CharData.CharacterName
-        };
-
-        StatusEffects.Add(instance);
-    }
-
-    #endregion
+    #endregion Abilities
 
     #region TurnOrder Logic
 
@@ -532,7 +392,6 @@ public class BattleCharacter : MonoBehaviour
 
     public void EndTurn()
     {
-        StatusEffects = EffectHandler.ReduceDurationForAllEffects(this, StatusEffects);
         Debug.Log("EndTurn for: " + CharData.CharacterName);
     }
     #endregion

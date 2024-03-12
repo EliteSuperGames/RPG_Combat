@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public class BattlePosition : MonoBehaviour
@@ -83,19 +79,15 @@ public class BattlePosition : MonoBehaviour
     public void EnableActiveCharacterIndicator()
     {
         activeCharacterIndicator.gameObject.SetActive(true);
-        // IsTargetable = true;
     }
 
     public void HideActiveCharacterIndicator()
     {
-        Debug.Log("Hiding active character indicator for: " + battleCharacter.CharData.CharacterName);
         activeCharacterIndicator.gameObject.SetActive(false);
-        // IsTargetable = dfalse;
     }
 
     public void EnableTargetableIndicator(bool showHostileColor)
     {
-        // Debug.Log("ShowTargetableIndicator");
         targetableCharacterSprite.gameObject.SetActive(true);
 
         if (showHostileColor)

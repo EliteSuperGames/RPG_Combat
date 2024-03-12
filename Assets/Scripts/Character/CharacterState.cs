@@ -7,5 +7,6 @@ public enum CharacterState
     Unconscious,
     Stunned,
     Sleeping,
-    Petrified
+    Petrified,
+    Defend
 }

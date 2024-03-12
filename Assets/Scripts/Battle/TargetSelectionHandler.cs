@@ -15,8 +15,7 @@ public static class TargetSelectionHandler
     )
     {
         List<EligibleAbility> eligibleAbilities = new List<EligibleAbility>();
-        Debug.LogError("ability count: " + battleCharacter.Abilities.Count);
-        Debug.Log("First ability name: " + battleCharacter.Abilities[0].AbilityData.abilityName);
+
         foreach (var ability in battleCharacter.Abilities)
         {
             EligibleAbility eligibleAbility = new EligibleAbility(ability)
@@ -26,6 +25,7 @@ public static class TargetSelectionHandler
             };
             eligibleAbilities.Add(eligibleAbility);
         }
+
         return eligibleAbilities;
     }
 
@@ -101,7 +101,6 @@ public static class TargetSelectionHandler
         Ability SelectedAbility
     )
     {
-        Debug.Log("OnTargetHover: " + SelectedAbility.AbilityData.abilityName);
         if (activeTarget != null)
         {
             activeTarget.BattlePosition.HideTransparentTarget();
@@ -166,36 +165,85 @@ public static class TargetSelectionHandler
     )
     {
         List<BattleCharacter> targets = new List<BattleCharacter>();
+
         if (SelectedAbility.AbilityData.targetingType == TargetingType.Single)
         {
             targets.Add(target);
-            if (targets.Contains(target))
-            {
-                activeCharacter.BattlePosition.HideActiveCharacterIndicator();
-                activeCharacter.UseSingleTargetAbility(target, SelectedAbility);
-                currentBattleState = BattleManagerState.ChoosingAction;
-                isHandlingTargetSelection = false;
-                HideTargetIndicators(allPositions);
-                battleUIParent.ClearCharacterData();
-                TurnOrderManager.Instance.CharacterTurnComplete(activeCharacter);
-            }
         }
         else
         {
             targets = GetMultipleAbilityTargets(activeCharacter, SelectedAbility, playerPositions, enemyPositions);
+        }
 
-            if (targets.Contains(target))
-            {
-                activeCharacter.BattlePosition.HideActiveCharacterIndicator();
-                activeCharacter.UseAbility(targets, SelectedAbility);
-                currentBattleState = BattleManagerState.ChoosingAction;
-                isHandlingTargetSelection = false;
-                HideTargetIndicators(allPositions);
-                battleUIParent.ClearCharacterData();
-                TurnOrderManager.Instance.CharacterTurnComplete(activeCharacter);
-            }
+        if (targets.Contains(target))
+        {
+            activeCharacter.BattlePosition.HideActiveCharacterIndicator();
+            activeCharacter.UseAbility(targets, SelectedAbility);
+            currentBattleState = BattleManagerState.ChoosingAction;
+            isHandlingTargetSelection = false;
+            HideTargetIndicators(allPositions);
+            battleUIParent.ClearCharacterData();
+
+            TurnOrderManager.Instance.CharacterTurnComplete(activeCharacter);
         }
     }
+
+    // public static void OnTargetClick(
+    //     BattleCharacter target,
+    //     BattleCharacter activeCharacter,
+    //     Ability SelectedAbility,
+    //     ref BattleManagerState currentBattleState,
+    //     ref bool isHandlingTargetSelection,
+    //     List<BattlePosition> allPositions,
+    //     BattleUIParent battleUIParent,
+    //     List<BattlePosition> playerPositions,
+    //     List<BattlePosition> enemyPositions
+    // )
+    // {
+    //     List<BattleCharacter> targets = new List<BattleCharacter>();
+    //     // if (SelectedAbility.AbilityData.targetingType == TargetingType.Single)
+    //     // {
+    //     //     targets.Add(target);
+    //     //     if (targets.Contains(target))
+    //     //     {
+    //     //         activeCharacter.BattlePosition.HideActiveCharacterIndicator();
+    //     //         // activeCharacter.UseSingleTargetAbility(target, SelectedAbility);
+    //     //         activeCharacter.UseAbility(targets, SelectedAbility);
+    //     //         currentBattleState = BattleManagerState.ChoosingAction;
+    //     //         isHandlingTargetSelection = false;
+    //     //         HideTargetIndicators(allPositions);
+    //     //         battleUIParent.ClearCharacterData();
+
+    //     //         TurnOrderManager.Instance.CharacterTurnComplete(activeCharacter);
+    //     //     }
+    //     // }
+    //     // else
+    //     // {
+    //     targets = GetMultipleAbilityTargets(activeCharacter, SelectedAbility, playerPositions, enemyPositions);
+    //     Debug.Log("clicked on this shit: " + target.CharData.CharacterName);
+    //     Debug.Log("using this ability: " + SelectedAbility.AbilityData.abilityName);
+    //     foreach (var effect in SelectedAbility.TargetEffects)
+    //     {
+    //         Debug.Log("effect: " + effect.data.effectName);
+    //     }
+
+    //     foreach (var effect in SelectedAbility.CasterEffects)
+    //     {
+    //         Debug.Log("effect: " + effect.data.effectName);
+    //     }
+    //     if (targets.Contains(target))
+    //     {
+    //         activeCharacter.BattlePosition.HideActiveCharacterIndicator();
+    //         activeCharacter.UseAbility(targets, SelectedAbility);
+    //         currentBattleState = BattleManagerState.ChoosingAction;
+    //         isHandlingTargetSelection = false;
+    //         HideTargetIndicators(allPositions);
+    //         battleUIParent.ClearCharacterData();
+
+    //         TurnOrderManager.Instance.CharacterTurnComplete(activeCharacter);
+    //     }
+    //     // }
+    // }
 
     private static List<BattleCharacter> GetMultipleAbilityTargets(
         BattleCharacter activeCharacter,
@@ -227,6 +275,10 @@ public static class TargetSelectionHandler
             }
         }
 
+        foreach (var target in targetsToReturn)
+        {
+            Debug.Log("target: " + target.CharData.CharacterName);
+        }
         return targetsToReturn;
     }
 
@@ -255,8 +307,6 @@ public static class TargetSelectionHandler
         List<BattlePosition> enemyPositions
     )
     {
-        Debug.Log("SetAbilityTargets");
-
         int activeCharIndex = activeCharacter.BattlePosition.PositionNumber;
         int maxForwardPosition = activeCharIndex + -activeCharacter.CharData.ForwardMovement;
         int maxBackwardPosition = activeCharIndex + activeCharacter.CharData.BackwardMovement;
@@ -269,11 +319,11 @@ public static class TargetSelectionHandler
         Debug.Log("maxBackwardPosition: " + maxBackwardPosition);
 
         // check if the ability has a move self effect
-        foreach (var effect in ability.AbilityData.effects)
-        {
-            Debug.Log("effect Name: " + effect.effectName);
-            Debug.Log("effect type: " + effect.effectType);
-        }
+        // foreach (var effect in ability.AbilityData.effects)
+        // {
+        //     Debug.Log("effect Name: " + effect.effectName);
+        //     Debug.Log("effect type: " + effect.effectType);
+        // }
         if (ability.AbilityData.abilityName == "Change Positions")
         {
             Debug.Log("has move self effect");

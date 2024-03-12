@@ -2,10 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Battle/Ability")]
+[CreateAssetMenu(fileName = "Ability", menuName = "Attacks/Ability")]
 public class AbilityData : ScriptableObject
 {
     public string abilityName;
+
+    [Space(15)]
+    public string abilityDescription;
+
+    [Space(15)]
+    public TargetingType targetingType;
 
     [Space(15)]
     public TargetFaction targetFaction;
@@ -14,19 +20,9 @@ public class AbilityData : ScriptableObject
     [Range(0, 3)]
     public List<int> launchPositions = new List<int>();
 
-    [Tooltip("Single can target any of the listed landing positions, Multiple will target all landing positions")]
-    [Space(15)]
-    public TargetingType targetingType;
-
     [Space(15)]
     [Range(0, 3)]
     public List<int> landingPositions = new List<int>();
-
-    [Space(15)]
-    public List<StatusEffectData> effects = new List<StatusEffectData>();
-
-    [Space(15)]
-    public string abilityDescription;
 
     [Space(15)]
     [Range(0, 10)]
@@ -35,15 +31,15 @@ public class AbilityData : ScriptableObject
     [Space(15)]
     public int baseAbilityPower;
 
-    /// <summary>
-    /// Not sure this is needed anymore
-    /// </summary>
-    // [Space(15)]
-    // public List<AbilityType> abilityTypes = new List<AbilityType>();
-
     [Space(15)]
     public bool onlyTargetUnconscious = false;
 
     [Space(15)]
     public bool canOnlyTargetSelf = false;
+
+    [Space(15)]
+    public List<EffectData> targetEffects = new List<EffectData>();
+
+    [Space(15)]
+    public List<EffectData> casterEffects = new List<EffectData>();
 }
