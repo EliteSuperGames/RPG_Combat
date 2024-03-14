@@ -1,3 +1,5 @@
+using System.Linq;
+
 public class StatBoostEffect : StatusEffect
 {
     private StatBoostEffectData StatBoostData => (StatBoostEffectData)data;
@@ -20,6 +22,10 @@ public class StatBoostEffect : StatusEffect
         target.CharData.MagicPower += statBoostData.magicBoost;
         target.CharData.Speed += statBoostData.speedBoost;
         target.StatusEffects.Add(this);
+        if (!target.StatusEffects.OfType<StatBoostEffect>().Any())
+        {
+            target.StatusEffects.Add(this);
+        }
     }
 
     public override void Update()
@@ -27,11 +33,15 @@ public class StatBoostEffect : StatusEffect
         base.Update();
         if (duration == 0)
         {
-            StatBoostEffectData statBoostData = (StatBoostEffectData)data;
-            target.CharData.MaxHealth -= statBoostData.maxHealthBoost;
-            target.CharData.PhysicalPower -= statBoostData.attackBoost;
-            target.CharData.MagicPower -= statBoostData.magicBoost;
-            target.CharData.Speed -= statBoostData.speedBoost;
+            RemoveEffect();
         }
+    }
+
+    public void RemoveEffect()
+    {
+        target.CharData.MaxHealth -= StatBoostData.maxHealthBoost;
+        target.CharData.PhysicalPower -= StatBoostData.attackBoost;
+        target.CharData.MagicPower -= StatBoostData.magicBoost;
+        target.CharData.Speed -= StatBoostData.speedBoost;
     }
 }

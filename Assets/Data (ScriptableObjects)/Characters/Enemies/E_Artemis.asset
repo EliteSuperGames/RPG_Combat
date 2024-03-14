@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 816b6bcf12d4a0d48b16f20da45a2dc5, type: 3}
-  m_Name: Enemy_Artemis
+  m_Name: E_Artemis
   m_EditorClassIdentifier: 
   characterName: Artemis
   maxHealth: 50

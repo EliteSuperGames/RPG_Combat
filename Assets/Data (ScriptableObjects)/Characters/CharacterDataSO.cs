@@ -17,25 +17,17 @@ public class CharacterDataSO : ScriptableObject
     public int speed;
     public int physicalPower;
     public int magicPower;
-
-    /// <summary> Is this a player or an enemy? </summary>
     public bool playerCharacter;
-
-    ///<summary>How many slots the character will occupy in battle</summary>
     public int battleSize;
     public Color spriteColor;
     public Sprite characterSprite;
     public Sprite characterPortrait;
     public List<AbilityData> abilityList = new List<AbilityData>();
+    public Range range;
 
     [Range(0, 3)]
     public int forwardMovement;
 
     [Range(0, 3)]
     public int backwardMovement;
-    // public SpriteRenderer characterSpriteRenderer;
-    // public string spriteAddressableKey;
-    // public string initialSpriteName;
-    // public Sprite characterSprite;
-    // public AnimatorOverrideController characterAnimatorController;
 }

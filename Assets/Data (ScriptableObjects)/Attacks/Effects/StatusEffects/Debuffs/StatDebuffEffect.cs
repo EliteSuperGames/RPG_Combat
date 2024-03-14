@@ -34,11 +34,15 @@ public class StatDebuffEffect : StatusEffect
         base.Update();
         if (duration == 0)
         {
-            StatDebuffEffectData StatDebuffData = (StatDebuffEffectData)data;
-            target.CharData.MaxHealth += StatDebuffData.maxHealthDebuff;
-            target.CharData.PhysicalPower += StatDebuffData.attackDebuff;
-            target.CharData.MagicPower += StatDebuffData.magicDebuff;
-            target.CharData.Speed += StatDebuffData.speedDebuff;
+            RemoveEffect();
         }
+    }
+
+    public void RemoveEffect()
+    {
+        target.CharData.MaxHealth += StatDebuffData.maxHealthDebuff;
+        target.CharData.PhysicalPower += StatDebuffData.attackDebuff;
+        target.CharData.MagicPower += StatDebuffData.magicDebuff;
+        target.CharData.Speed += StatDebuffData.speedDebuff;
     }
 }

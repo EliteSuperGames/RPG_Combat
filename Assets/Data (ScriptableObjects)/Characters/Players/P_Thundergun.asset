@@ -10,21 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 816b6bcf12d4a0d48b16f20da45a2dc5, type: 3}
-  m_Name: Enemy_Cricket
+  m_Name: P_Thundergun
   m_EditorClassIdentifier: 
-  characterName: Cricket
+  characterName: Thundergun
   maxHealth: 50
-  speed: 12
+  speed: 3
   physicalPower: 15
   magicPower: 3
-  playerCharacter: 0
+  playerCharacter: 1
   battleSize: 1
-  spriteColor: {r: 0, g: 0.108952045, b: 1, a: 1}
-  characterSprite: {fileID: -2046704090, guid: 0d8cfe44ad0dba34d847839fa3bd11ef, type: 3}
-  characterPortrait: {fileID: 21300000, guid: 2fad53ffa0b3df34b8fc54b36b18f21e, type: 3}
+  spriteColor: {r: 0.7169812, g: 0.7077842, b: 0.043965846, a: 1}
+  characterSprite: {fileID: 1262420745, guid: 1ac741f603a41e646a30828d2ae5eea7, type: 3}
+  characterPortrait: {fileID: 21300000, guid: 4d6cf1f627f797348aa7d2293b28d171, type: 3}
   abilityList:
   - {fileID: 11400000, guid: c5971f88a072f60448d1f246df55d2db, type: 2}
   - {fileID: 11400000, guid: ece3dac8cf957b6408f4a2ba2b462706, type: 2}
   - {fileID: 11400000, guid: 221b483002f62c74c98592f1294478ce, type: 2}
-  forwardMovement: 3
+  range: 2
+  forwardMovement: 1
   backwardMovement: 2

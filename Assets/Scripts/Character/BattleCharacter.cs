@@ -70,22 +70,6 @@ public class BattleCharacter : MonoBehaviour
     public event Action<BattleCharacter> OnCharacterDeath;
     public event Action<BattleCharacter> OnCharacterRevive;
 
-    private List<StatModifier> _positiveStatModifiers = new List<StatModifier>();
-
-    public List<StatModifier> PositiveStatModifiers
-    {
-        get { return _positiveStatModifiers; }
-        set { _positiveStatModifiers = value; }
-    }
-
-    private List<StatModifier> _negativeStatModifiers = new List<StatModifier>();
-
-    public List<StatModifier> NegativeStatModifiers
-    {
-        get { return _negativeStatModifiers; }
-        set { _negativeStatModifiers = value; }
-    }
-
     public bool PlayerCharacter { get; private set; }
     public Vector3 targetPosition;
     public float moveSpeed = 1f;
@@ -105,11 +89,7 @@ public class BattleCharacter : MonoBehaviour
     public void Awake()
     {
         // Initialize the lists if needed
-        if (PositiveStatModifiers == null)
-            PositiveStatModifiers = new List<StatModifier>();
 
-        if (NegativeStatModifiers == null)
-            NegativeStatModifiers = new List<StatModifier>();
         HealthbarController = FindObjectOfType<HealthbarController>();
     }
 
