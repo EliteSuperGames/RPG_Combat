@@ -54,6 +54,22 @@ public class CharacterData
     }
 
     [SerializeField]
+    private int _magicDefense;
+    public int MagicDefense
+    {
+        get { return _magicDefense; }
+        set { _magicDefense = value; }
+    }
+
+    [SerializeField]
+    private int _physicalDefense;
+    public int PhysicalDefense
+    {
+        get { return _physicalDefense; }
+        set { _physicalDefense = value; }
+    }
+
+    [SerializeField]
     private List<Ability> _abilities = new List<Ability>();
     public List<Ability> Abilities
     {
@@ -102,11 +118,11 @@ public class CharacterData
     }
 
     [SerializeField]
-    private int _formationPosition = -1;
+    private int formationPosition = -1;
     public int FormationPosition
     {
-        get { return _formationPosition; }
-        set { _formationPosition = value; }
+        get { return formationPosition; }
+        set { formationPosition = value; }
     }
 
     [SerializeField]
@@ -125,6 +141,14 @@ public class CharacterData
         set { backwardMovement = value; }
     }
 
+    [SerializeField]
+    private Range range;
+    public Range Range
+    {
+        get { return range; }
+        set { range = value; }
+    }
+
     public CharacterData(CharacterData data)
     {
         CharacterName = data.CharacterName;
@@ -133,6 +157,8 @@ public class CharacterData
         Health = data.MaxHealth;
         PhysicalPower = data.PhysicalPower;
         MagicPower = data.MagicPower;
+        MagicDefense = data.MagicDefense;
+        PhysicalDefense = data.PhysicalDefense;
         PlayerCharacter = data.PlayerCharacter;
         BattleSize = data.BattleSize;
         SpriteColor = data.SpriteColor;
@@ -141,6 +167,7 @@ public class CharacterData
         Abilities = data.Abilities;
         ForwardMovement = data.forwardMovement;
         BackwardMovement = data.backwardMovement;
+        Range = data.Range;
     }
 
     public CharacterData(CharacterDataSO data)
@@ -151,14 +178,18 @@ public class CharacterData
         Health = data.maxHealth;
         PhysicalPower = data.physicalPower;
         MagicPower = data.magicPower;
+        MagicDefense = data.magicDefense;
+        PhysicalDefense = data.physicalDefense;
         PlayerCharacter = data.playerCharacter;
         BattleSize = data.battleSize;
         SpriteColor = data.spriteColor;
+
         CharacterSprite = data.characterSprite;
         CharacterPortrait = data.characterPortrait;
         ForwardMovement = data.forwardMovement;
         BackwardMovement = data.backwardMovement;
         Abilities = ConvertAbilitiesToInstances(data.abilityList);
+        Range = data.range;
     }
 
     private List<Ability> ConvertAbilitiesToInstances(List<AbilityData> abilities)

@@ -20,6 +20,11 @@ public class BattlePosition : MonoBehaviour
 
     [SerializeField]
     private BattleCharacter battleCharacter;
+    public BattleCharacter BattleCharacter
+    {
+        get { return battleCharacter; }
+        private set { battleCharacter = value; }
+    }
 
     [SerializeField]
     private Healthbar healthBar;
@@ -59,11 +64,6 @@ public class BattlePosition : MonoBehaviour
         }
         healthBar.gameObject.SetActive(true);
         character.RefreshHealthbar();
-    }
-
-    public BattleCharacter GetOccupyingBattleCharacter()
-    {
-        return battleCharacter;
     }
 
     public void EnableHealthObject()

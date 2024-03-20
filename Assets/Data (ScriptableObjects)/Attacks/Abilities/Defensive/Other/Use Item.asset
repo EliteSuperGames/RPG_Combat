@@ -10,18 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bb2bcba5bd8b2342854fe4b24f44476, type: 3}
-  m_Name: Change Positions
+  m_Name: Use Item
   m_EditorClassIdentifier: 
-  abilityName: Change Positions
-  abilityDescription: Move
-  targetingType: 0
-  targetFaction: 2
-  launchPositions: 
-  landingPositions: 
+  abilityName: Use Item
+  abilityDescription: Use an Item
+  targetFaction: 0
+  areaOfEffect: 0
+  abilityRange: 0
   cooldownLength: 0
   baseAbilityPower: 0
   onlyTargetUnconscious: 0
   canOnlyTargetSelf: 0
-  targetEffects:
-  - {fileID: 11400000, guid: d289ca6ba3cbdc44680daf03ed7e8c32, type: 2}
+  targetEffects: []
   casterEffects: []

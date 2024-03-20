@@ -7,6 +7,11 @@ public class PoisonEffectData : StatusEffectData
 {
     public int damagePerTurn;
 
+    public override StatusEffectData Clone()
+    {
+        return new PoisonEffectData() { damagePerTurn = damagePerTurn };
+    }
+
     public override Effect CreateEffect()
     {
         return new PoisonEffect(this);

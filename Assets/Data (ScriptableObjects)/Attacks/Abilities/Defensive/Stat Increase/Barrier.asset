@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bb2bcba5bd8b2342854fe4b24f44476, type: 3}
-  m_Name: Minor Renew
+  m_Name: Barrier
   m_EditorClassIdentifier: 
-  abilityName: Minor Renew
-  abilityDescription: Applies Minor Renew (heal 5 health per turn)
-  targetingType: 0
+  abilityName: Barrier
+  abilityDescription: Adds significant magic and physical protection to the target
   targetFaction: 0
-  launchPositions: 00000000010000000200000003000000
-  landingPositions: 00000000010000000200000003000000
-  cooldownLength: 1
-  baseAbilityPower: 0
+  areaOfEffect: 0
+  abilityRange: 2
+  cooldownLength: 2
+  baseAbilityPower: 15
   onlyTargetUnconscious: 0
   canOnlyTargetSelf: 0
   targetEffects:
-  - {fileID: 11400000, guid: 6548ca429fb62284a96fade3519278a7, type: 2}
+  - {fileID: 11400000, guid: a28f91fad6ec3264fb78f379bdf9b4a7, type: 2}
   casterEffects: []

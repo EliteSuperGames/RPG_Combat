@@ -10,17 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bb2bcba5bd8b2342854fe4b24f44476, type: 3}
-  m_Name: Use Item
+  m_Name: Poison Slice
   m_EditorClassIdentifier: 
-  abilityName: Use Item
-  targetFaction: 0
-  launchPositions: 
-  targetingType: 0
-  landingPositions: 
-  effects: []
-  abilityDescription: 
+  abilityName: Poison Slice
+  abilityDescription: Slices someone with a shit covered sword, applying some nasty
+    poison
+  targetFaction: 1
+  areaOfEffect: 0
+  abilityRange: 1
   cooldownLength: 0
-  baseAbilityPower: 0
-  abilityTypes: 
+  baseAbilityPower: 5
   onlyTargetUnconscious: 0
   canOnlyTargetSelf: 0
+  targetEffects:
+  - {fileID: 11400000, guid: 39be5b12da34082468d5d3c86c82444e, type: 2}
+  - {fileID: 11400000, guid: a395cb452e164fb4fbb9aead32aa0d8b, type: 2}
+  casterEffects: []

@@ -19,6 +19,8 @@ public class CharacterDataSO : ScriptableObject
     public int magicPower;
     public bool playerCharacter;
     public int battleSize;
+    public int magicDefense;
+    public int physicalDefense;
     public Color spriteColor;
     public Sprite characterSprite;
     public Sprite characterPortrait;

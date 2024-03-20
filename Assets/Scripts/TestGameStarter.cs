@@ -21,7 +21,7 @@ public class TestGameStarter : MonoBehaviour
         {
             foreach (CharacterDataSO charDataSO in charactersToMake)
             {
-                CharacterData character = new CharacterData(charDataSO);
+                CharacterData character = new CharacterData(charDataSO) { FormationPosition = partyManager.ActivePartyMembers.Count };
                 partyManager.AddCharacterToActiveParty(character);
                 partyManager.AddCharacterToBattleParty(character);
             }

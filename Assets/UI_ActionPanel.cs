@@ -164,6 +164,8 @@ public class UI_ActionPanel : MonoBehaviour
 
     public void SetAvailableAbilities(List<EligibleAbility> availableAbilities)
     {
+        Debug.Log("SetAvailableAbilities");
+        Debug.Log("Available Abilities: " + availableAbilities.Count);
         ClearActionButtons();
 
         // Create a new list that includes both the character's abilities and the static abilities
@@ -176,6 +178,7 @@ public class UI_ActionPanel : MonoBehaviour
 
         foreach (EligibleAbility eligibleAbility in allAbilities)
         {
+            Debug.Log("Making ability buttons");
             CreateAbilityButton(
                 eligibleAbility.Ability,
                 eligibleAbility.EligibleBasedOnLaunchPosition,
@@ -205,6 +208,7 @@ public class UI_ActionPanel : MonoBehaviour
 
     private void CreateAbilityButton(Ability ability, bool IsEligibleBasedOnOwnPosition, bool IsEligibleBasedOnTargetPositions)
     {
+        Debug.Log("CreateAbilityButton: " + IsEligibleBasedOnOwnPosition + " " + IsEligibleBasedOnTargetPositions);
         GameObject buttonGO;
         List<string> staticAbilities = new List<string> { "Change Positions", "Skip Turn", "Use Item" };
 

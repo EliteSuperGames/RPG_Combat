@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 [System.Serializable]
 public class StatusEffect : Effect
@@ -9,6 +10,7 @@ public class StatusEffect : Effect
     public StatusEffect(StatusEffectData data)
         : base(data)
     {
+        this.data = data;
         duration = data.duration;
     }
 
@@ -16,6 +18,13 @@ public class StatusEffect : Effect
     {
         this.target = target;
         target.StatusEffects.Add(this);
+    }
+
+    public virtual StatusEffect Clone()
+    {
+        var clonedData = ((StatusEffectData)data).Clone();
+        var clonedEffect = new StatusEffect(clonedData) { duration = duration };
+        return clonedEffect;
     }
 
     public virtual void Update()

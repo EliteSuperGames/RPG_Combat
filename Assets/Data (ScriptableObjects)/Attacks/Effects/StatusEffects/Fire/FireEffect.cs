@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FireEffect : StatusEffect
@@ -22,5 +20,11 @@ public class FireEffect : StatusEffect
     {
         Debug.Log(data.name + " is updating");
         base.Update();
+    }
+
+    public override StatusEffect Clone()
+    {
+        var clonedEffect = new FireEffect((FireEffectData)FireData.Clone());
+        return clonedEffect;
     }
 }

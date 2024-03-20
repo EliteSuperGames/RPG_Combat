@@ -102,7 +102,7 @@ public class BattleCharacter : MonoBehaviour
         InitialCharacterData = new CharacterData(data);
         PlayerCharacter = data.PlayerCharacter;
         FormationPosition = data.FormationPosition;
-
+        Debug.Log("FormationPosition: " + FormationPosition + " for " + CharData.CharacterName);
         Abilities = data.Abilities;
 
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();

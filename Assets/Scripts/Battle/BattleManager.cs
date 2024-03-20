@@ -74,6 +74,7 @@ public class BattleManager : MonoBehaviour
 
     [Space(15)]
     [Header("BattleCharacters")]
+    [SerializeField]
     private List<BattleCharacter> playerBattleCharacters = new List<BattleCharacter>();
     public List<BattleCharacter> PlayerBattleCharacters
     {
@@ -81,6 +82,7 @@ public class BattleManager : MonoBehaviour
         set { playerBattleCharacters = value; }
     }
 
+    [Space(15)]
     [SerializeField]
     private List<BattleCharacter> enemyBattleCharacters = new List<BattleCharacter>();
     public List<BattleCharacter> EnemyBattleCharacters
@@ -121,6 +123,7 @@ public class BattleManager : MonoBehaviour
         }
 
         currentBattleState = value;
+        Debug.Log("CurrentBattleState: " + currentBattleState.ToString());
 
         if (currentBattleState == BattleManagerState.ChoosingEnemyTarget || currentBattleState == BattleManagerState.ChoosingAllyTarget)
         {
@@ -327,6 +330,7 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator HandleTargetSelection(BattleManagerState targetSelectionState)
     {
+        Debug.Log("HandleTargetSelection");
         IsHandlingTargetSelection = true;
         while (CurrentBattleState == targetSelectionState)
         {

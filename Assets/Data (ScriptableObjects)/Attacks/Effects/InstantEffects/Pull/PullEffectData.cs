@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "PullEffectData", menuName = "Attacks/Effects/InstantEffects/Pull")]
-public class PullEffectData : StatusEffectData
+public class PullEffectData : EffectData
 {
     [Range(0, 3)]
     public int pullDistance;

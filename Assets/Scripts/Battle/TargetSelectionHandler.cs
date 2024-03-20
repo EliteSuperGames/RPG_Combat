@@ -20,12 +20,15 @@ public static class TargetSelectionHandler
         {
             EligibleAbility eligibleAbility = new EligibleAbility(ability)
             {
-                EligibleBasedOnLaunchPosition = ability.AbilityData.launchPositions.Contains(battleCharacter.BattlePosition.PositionNumber),
+                EligibleBasedOnLaunchPosition = true,
+                // // EligibleBasedOnLaunchPosition = ability.AbilityData.launchPositions.Contains(battleCharacter.BattlePosition.PositionNumber),
                 EligibleBasedOnLandingTargets = DoesLandingPositionHaveValidTarget(battleCharacter, ability, playerPositions, enemyPositions)
             };
+
+            Debug.Log("eligibleAbility: " + eligibleAbility.Ability.AbilityData.abilityName);
             eligibleAbilities.Add(eligibleAbility);
         }
-
+        Debug.Log("Returning these: " + eligibleAbilities.Count);
         return eligibleAbilities;
     }
 
@@ -57,43 +60,68 @@ public static class TargetSelectionHandler
 
         if (caster.PlayerCharacter)
         {
-            targetList = ability.AbilityData.targetFaction == TargetFaction.Allies ? playerPositions : enemyPositions;
+            targetList = enemyPositions;
         }
         else
         {
-            targetList = ability.AbilityData.targetFaction == TargetFaction.Allies ? enemyPositions : playerPositions;
+            targetList = playerPositions;
+        }
+        if (ability.AbilityData.onlyTargetUnconscious)
+        {
+            return targetList.Any(pos => pos.BattleCharacter.CurrentState == CharacterState.Unconscious);
         }
 
-        foreach (var (landingPos, targetPos) in ability.AbilityData.landingPositions.Zip(targetList, (lp, tp) => (lp, tp)))
+        // if caster is in positions 0, 1, or 2, then short range ability can target enemy positions 0, 1, 2
+        // if caster is in positions 3, 4, or 5, then short range ability cannot be used
+
+        // if caster is in positions 0, 1, or 2, then medium range ability can target any enemy position
+        // if caster is in positions 3, 4, or 5, then medium range ability can target enemy positions 0, 1, 2
+
+        // long range ability can target any position from any position
+
+        if (ability.AbilityData.abilityRange == AbilityRange.Short)
         {
-            // Check if the target position is valid and contains a character
-            var targetCharacter = targetPos.GetOccupyingBattleCharacter();
-            if (targetCharacter != null)
+            Debug.Log("Short range ability");
+            if (caster.BattlePosition.PositionNumber < 3)
             {
-                if (ability.AbilityData.onlyTargetUnconscious)
-                {
-                    // If onlyTargetUnconscious is true, check if the character is unconscious
-                    if (targetCharacter.CurrentState == CharacterState.Unconscious)
-                    {
-                        return true; // At least one valid unconscious character found
-                    }
-                }
-                else if (targetCharacter.CurrentState != CharacterState.Unconscious)
-                {
-                    return true; // At least one valid conscious character found
-                }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
-
-        return false; // No valid character found
+        else if (ability.AbilityData.abilityRange == AbilityRange.Medium)
+        {
+            return true;
+        }
+        else if (ability.AbilityData.abilityRange == AbilityRange.Long)
+        {
+            return true;
+        }
+        else if (ability.AbilityData.abilityRange == AbilityRange.Inherit)
+        {
+            if (caster.CharData.Range == Range.Short && caster.BattlePosition.PositionNumber > 2)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return true;
+        }
     }
 
     public static void OnTargetHover(
         List<BattlePosition> currentValidTargets,
         BattleCharacter hoverTarget,
         bool isAlly,
-        ref BattleCharacter activeTarget,
-        BattleCharacter activeCharacter,
+        ref BattleCharacter target,
+        BattleCharacter caster,
         List<BattlePosition> playerPositions,
         List<BattlePosition> enemyPositions,
         // ref UI_ActionPanel actionPanel,
@@ -101,24 +129,28 @@ public static class TargetSelectionHandler
         Ability SelectedAbility
     )
     {
-        if (activeTarget != null)
+        Debug.Log("OnTargetHover");
+        Debug.Log("active character: " + caster.CharData.CharacterName);
+        Debug.Log("hover target: " + hoverTarget.CharData.CharacterName);
+        Debug.Log("selected ability: " + SelectedAbility.AbilityData.abilityName);
+        if (target != null)
         {
-            activeTarget.BattlePosition.HideTransparentTarget();
+            target.BattlePosition.HideTransparentTarget();
         }
 
         IEnumerable<BattlePosition> positionList;
 
         if (SelectedAbility.AbilityData.targetFaction == TargetFaction.Allies)
         {
-            positionList = activeCharacter.PlayerCharacter ? playerPositions : enemyPositions;
+            positionList = caster.PlayerCharacter ? playerPositions : enemyPositions;
         }
         else
         {
-            positionList = activeCharacter.PlayerCharacter ? enemyPositions : playerPositions;
+            positionList = caster.PlayerCharacter ? enemyPositions : playerPositions;
         }
-        activeTarget = hoverTarget;
+        target = hoverTarget;
 
-        battleUIParent.SetTargetCharacterData(activeCharacter, activeTarget);
+        battleUIParent.SetTargetCharacterData(caster, target);
 
         // if it is a moveSelf ability, show the transparent target indicator
         // if (SelectedAbility.AbilityData.effects.Any(effect => effect.effectType == EffectType.MoveSelf))
@@ -135,7 +167,8 @@ public static class TargetSelectionHandler
         // else
         if (currentValidTargets.Contains(hoverTarget.BattlePosition))
         {
-            if (SelectedAbility.AbilityData.targetingType == TargetingType.Multiple)
+            if (SelectedAbility.AbilityData.areaOfEffect != AreaOfEffect.Single)
+            // if (SelectedAbility.AbilityData.areaOfEffect == AreaOfEffect. == TargetingType.Multiple)
             {
                 foreach (var position in positionList)
                 {
@@ -166,13 +199,13 @@ public static class TargetSelectionHandler
     {
         List<BattleCharacter> targets = new List<BattleCharacter>();
 
-        if (SelectedAbility.AbilityData.targetingType == TargetingType.Single)
+        if (SelectedAbility.AbilityData.areaOfEffect == AreaOfEffect.Single)
         {
             targets.Add(target);
         }
         else
         {
-            targets = GetMultipleAbilityTargets(activeCharacter, SelectedAbility, playerPositions, enemyPositions);
+            targets = GetMultipleAbilityTargets(activeCharacter, SelectedAbility, target, playerPositions, enemyPositions);
         }
 
         if (targets.Contains(target))
@@ -248,12 +281,12 @@ public static class TargetSelectionHandler
     private static List<BattleCharacter> GetMultipleAbilityTargets(
         BattleCharacter activeCharacter,
         Ability ability,
+        BattleCharacter target,
         List<BattlePosition> playerPositions,
         List<BattlePosition> enemyPositions
     )
     {
         IEnumerable<BattlePosition> positionsToProcess;
-        List<BattlePosition> positionsToReturn = new List<BattlePosition>();
         List<BattleCharacter> targetsToReturn = new List<BattleCharacter>();
         if (ability.AbilityData.targetFaction == TargetFaction.Allies)
         {
@@ -264,21 +297,27 @@ public static class TargetSelectionHandler
             positionsToProcess = activeCharacter.PlayerCharacter ? enemyPositions : playerPositions;
         }
 
-        foreach (var landingPos in ability.AbilityData.landingPositions)
+        foreach (var pos in positionsToProcess)
         {
-            var matchingPosition = positionsToProcess.FirstOrDefault(pos => pos.PositionNumber == landingPos);
-
-            if (matchingPosition != null)
+            if (ability.AbilityData.areaOfEffect == AreaOfEffect.SameRow)
             {
-                // positionsToReturn.Add(matchingPosition);
-                targetsToReturn.Add(matchingPosition.GetOccupyingBattleCharacter());
+                if (
+                    (target.BattlePosition.PositionNumber <= 2 && pos.PositionNumber <= 2)
+                    || (target.BattlePosition.PositionNumber > 2 && pos.PositionNumber > 2)
+                )
+                {
+                    targetsToReturn.Add(pos.BattleCharacter);
+                }
+            }
+            else if (ability.AbilityData.areaOfEffect == AreaOfEffect.Line)
+            {
+                if (Math.Abs(target.BattlePosition.PositionNumber - pos.PositionNumber) % 3 == 0)
+                {
+                    targetsToReturn.Add(pos.BattleCharacter);
+                }
             }
         }
 
-        foreach (var target in targetsToReturn)
-        {
-            Debug.Log("target: " + target.CharData.CharacterName);
-        }
         return targetsToReturn;
     }
 
@@ -296,20 +335,21 @@ public static class TargetSelectionHandler
 
     private static bool IsTargetValid(BattleCharacter target, List<BattlePosition> positions, Ability selectedAbility)
     {
-        return selectedAbility.AbilityData.landingPositions.Contains(target.BattlePosition.PositionNumber);
+        return true;
+        // return selectedAbility.AbilityData.landingPositions.Contains(target.BattlePosition.PositionNumber);
     }
 
     public static void SetAbilityTargets(
         Ability ability,
-        BattleCharacter activeCharacter,
+        BattleCharacter caster,
         ref List<BattlePosition> currentValidTargets,
         List<BattlePosition> playerPositions,
         List<BattlePosition> enemyPositions
     )
     {
-        int activeCharIndex = activeCharacter.BattlePosition.PositionNumber;
-        int maxForwardPosition = activeCharIndex + -activeCharacter.CharData.ForwardMovement;
-        int maxBackwardPosition = activeCharIndex + activeCharacter.CharData.BackwardMovement;
+        int activeCharIndex = caster.BattlePosition.PositionNumber;
+        int maxForwardPosition = activeCharIndex + -caster.CharData.ForwardMovement;
+        int maxBackwardPosition = activeCharIndex + caster.CharData.BackwardMovement;
         IEnumerable<BattlePosition> battlePositionsToProcess;
 
         bool showHostileColor = false;
@@ -330,11 +370,11 @@ public static class TargetSelectionHandler
             currentValidTargets = new List<BattlePosition>();
 
             // Assume characterCurrentPosition is the current position of the character
-            int characterCurrentPosition = activeCharacter.BattlePosition.PositionNumber;
+            int characterCurrentPosition = caster.BattlePosition.PositionNumber;
 
             // Assume forwardMovement and backwardMovement are the character's movement capabilities
-            int forwardMovement = activeCharacter.CharData.ForwardMovement;
-            int backwardMovement = activeCharacter.CharData.BackwardMovement;
+            int forwardMovement = caster.CharData.ForwardMovement;
+            int backwardMovement = caster.CharData.BackwardMovement;
 
             // Calculate the range of valid positions
             int forwardPosition = Math.Max(0, characterCurrentPosition - forwardMovement);
@@ -351,7 +391,7 @@ public static class TargetSelectionHandler
                 if (i != characterCurrentPosition)
                 {
                     Debug.Log("adding position: " + i + " to currentValidTargets");
-                    BattlePosition validPosition = GetPlayerPositionByNumber(activeCharacter.PlayerCharacter ? playerPositions : enemyPositions, i);
+                    BattlePosition validPosition = GetPlayerPositionByNumber(caster.PlayerCharacter ? playerPositions : enemyPositions, i);
                     validPosition.EnableTargetableIndicator(showHostileColor); // Add this line
                     currentValidTargets.Add(validPosition);
                 }
@@ -360,37 +400,75 @@ public static class TargetSelectionHandler
         }
         else
         {
+            Debug.LogError("Else");
             if (ability.AbilityData.targetFaction == TargetFaction.Allies)
             {
-                battlePositionsToProcess = activeCharacter.PlayerCharacter ? playerPositions : enemyPositions;
+                Debug.Log("Ally targets");
+                battlePositionsToProcess = caster.PlayerCharacter ? playerPositions : enemyPositions;
             }
             else
             {
+                Debug.Log("Enemy Targets");
                 showHostileColor = true;
-                battlePositionsToProcess = activeCharacter.PlayerCharacter ? enemyPositions : playerPositions;
+                battlePositionsToProcess = caster.PlayerCharacter ? enemyPositions : playerPositions;
             }
 
             currentValidTargets = new List<BattlePosition>();
-            foreach (var pos in ability.AbilityData.landingPositions)
-            {
-                // Debug.Log(pos);
 
+            Debug.Log(battlePositionsToProcess.Count());
+            Debug.Log(battlePositionsToProcess);
+
+            // ability.AbilityData.abilityRange
+            bool isInFrontRow = caster.BattlePosition.PositionNumber < 3;
+
+            if (isInFrontRow && ability.AbilityData.abilityRange == AbilityRange.Short)
+            {
+                battlePositionsToProcess = battlePositionsToProcess.Where(pos => pos.PositionNumber < 3);
+            }
+            else if (!isInFrontRow && ability.AbilityData.abilityRange == AbilityRange.Medium)
+            {
+                battlePositionsToProcess = battlePositionsToProcess.Where(pos => pos.PositionNumber < 3);
+            }
+
+            foreach (var pos in battlePositionsToProcess)
+            {
                 if (ability.AbilityData.onlyTargetUnconscious)
                 {
-                    if (battlePositionsToProcess.ElementAt(pos).GetOccupyingBattleCharacter().CurrentState == CharacterState.Unconscious)
+                    if (pos.BattleCharacter.CurrentState == CharacterState.Unconscious)
                     {
-                        battlePositionsToProcess.ElementAt(pos).EnableTargetableIndicator(showHostileColor);
-                        currentValidTargets.Add(battlePositionsToProcess.ElementAt(pos));
+                        pos.EnableTargetableIndicator(showHostileColor);
+                        currentValidTargets.Add(pos);
                     }
                     continue;
                 }
-                if (battlePositionsToProcess.ElementAt(pos).GetOccupyingBattleCharacter().CurrentState != CharacterState.Unconscious)
+                if (pos.BattleCharacter.CurrentState != CharacterState.Unconscious)
                 {
-                    battlePositionsToProcess.ElementAt(pos).EnableTargetableIndicator(showHostileColor);
-                    currentValidTargets.Add(battlePositionsToProcess.ElementAt(pos));
+                    pos.EnableTargetableIndicator(showHostileColor);
+                    currentValidTargets.Add(pos);
                 }
                 OnActiveTargetsFound?.Invoke(currentValidTargets);
             }
+
+            // foreach (var pos in ability.AbilityData.landingPositions)
+            // {
+            //     // Debug.Log(pos);
+
+            //     if (ability.AbilityData.onlyTargetUnconscious)
+            //     {
+            //         if (battlePositionsToProcess.ElementAt(pos).BattleCharacter.CurrentState == CharacterState.Unconscious)
+            //         {
+            //             battlePositionsToProcess.ElementAt(pos).EnableTargetableIndicator(showHostileColor);
+            //             currentValidTargets.Add(battlePositionsToProcess.ElementAt(pos));
+            //         }
+            //         continue;
+            //     }
+            //     if (battlePositionsToProcess.ElementAt(pos).BattleCharacter.CurrentState != CharacterState.Unconscious)
+            //     {
+            //         battlePositionsToProcess.ElementAt(pos).EnableTargetableIndicator(showHostileColor);
+            //         currentValidTargets.Add(battlePositionsToProcess.ElementAt(pos));
+            //     }
+            //     OnActiveTargetsFound?.Invoke(currentValidTargets);
+            // }
         }
     }
 

@@ -9,6 +9,21 @@ public class StatDebuffEffectData : StatusEffectData
     public int attackDebuff;
     public int speedDebuff;
     public int magicDebuff;
+    public int magicDefenseDebuff;
+    public int physicalDefenseDebuff;
+
+    public override StatusEffectData Clone()
+    {
+        return new StatDebuffEffectData()
+        {
+            maxHealthDebuff = maxHealthDebuff,
+            attackDebuff = attackDebuff,
+            speedDebuff = speedDebuff,
+            magicDebuff = magicDebuff,
+            magicDefenseDebuff = magicDefenseDebuff,
+            physicalDefenseDebuff = physicalDefenseDebuff
+        };
+    }
 
     public override Effect CreateEffect()
     {

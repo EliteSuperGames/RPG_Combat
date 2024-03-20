@@ -9,6 +9,21 @@ public class StatBoostEffectData : StatusEffectData
     public int attackBoost;
     public int speedBoost;
     public int magicBoost;
+    public int magicDefenseBoost;
+    public int physicalDefenseBoost;
+
+    public override StatusEffectData Clone()
+    {
+        return new StatBoostEffectData()
+        {
+            maxHealthBoost = maxHealthBoost,
+            attackBoost = attackBoost,
+            speedBoost = speedBoost,
+            magicBoost = magicBoost,
+            magicDefenseBoost = magicDefenseBoost,
+            physicalDefenseBoost = physicalDefenseBoost
+        };
+    }
 
     public override Effect CreateEffect()
     {

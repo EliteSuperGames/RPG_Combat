@@ -8,4 +8,6 @@ public abstract class StatusEffectData : EffectData
     public bool isStackable;
     public bool isRenewable;
     public float dispelResistance;
+
+    public abstract StatusEffectData Clone();
 }

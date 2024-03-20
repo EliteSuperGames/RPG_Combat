@@ -25,7 +25,7 @@ public class PartyManager : MonoBehaviour
     [Tooltip(
         "Maximum size of the Battle Party. If you have 6 in your Active Party, you can have up to 4 in your Battle Party, and 2 reserves that can be swapped out"
     )]
-    private int maxBattlePartySize = 4;
+    private int maxBattlePartySize = 6;
 
     [Tooltip("Maximum size of the Active Party, (Includes 4 in the Battle Party and 2 reserves)")]
     private int maxActivePartySize = 6;
@@ -75,7 +75,7 @@ public class PartyManager : MonoBehaviour
 
     public void AddCharacterToBattleParty(CharacterData character)
     {
-        // Debug.Log("Add Character to BattleParty: " + character);
+        Debug.Log("Add Character to BattleParty: " + character.CharacterName);
 
         // Character will probably not have a position, so fill them in to the next available slot
         if (character.FormationPosition == -1)
@@ -91,7 +91,7 @@ public class PartyManager : MonoBehaviour
         }
         else
         {
-            // Debug.LogWarning("Battle Party is full.");
+            Debug.LogWarning("Battle Party is full.");
         }
     }
 

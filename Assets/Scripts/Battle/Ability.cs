@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 [System.Serializable]
 public class Ability
@@ -52,12 +53,28 @@ public class Ability
         {
             foreach (var effect in TargetEffects)
             {
-                effect.Apply(caster, target);
+                if (effect is StatusEffect statusEffect)
+                {
+                    var clonedEffect = statusEffect.Clone();
+                    clonedEffect.Apply(caster, target);
+                }
+                else
+                {
+                    effect.Apply(caster, target);
+                }
             }
 
             foreach (var effect in CasterEffects)
             {
-                effect.Apply(caster, caster);
+                if (effect is StatusEffect statusEffect)
+                {
+                    var clonedEffect = statusEffect.Clone();
+                    clonedEffect.Apply(caster, caster);
+                }
+                else
+                {
+                    effect.Apply(caster, caster);
+                }
             }
         }
         if (_abilityData.cooldownLength > 0)

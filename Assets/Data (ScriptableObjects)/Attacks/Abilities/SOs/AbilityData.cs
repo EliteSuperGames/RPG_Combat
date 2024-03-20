@@ -11,18 +11,13 @@ public class AbilityData : ScriptableObject
     public string abilityDescription;
 
     [Space(15)]
-    public TargetingType targetingType;
-
-    [Space(15)]
     public TargetFaction targetFaction;
 
     [Space(15)]
-    [Range(0, 3)]
-    public List<int> launchPositions = new List<int>();
+    public AreaOfEffect areaOfEffect;
 
     [Space(15)]
-    [Range(0, 3)]
-    public List<int> landingPositions = new List<int>();
+    public AbilityRange abilityRange;
 
     [Space(15)]
     [Range(0, 10)]
