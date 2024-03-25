@@ -55,13 +55,8 @@ public class PartyManager : MonoBehaviour
         private set => battlePartymembers = value;
     }
 
-    void CreateParty() { }
-
     public void AddCharacterToActiveParty(CharacterData character)
     {
-        Debug.Log("Total members: " + activePartyMembers.Count);
-        Debug.Log("Add Character to Active Party: " + character.CharacterName);
-
         if (!activePartyMembers.Contains(character) && activePartyMembers.Count < maxActivePartySize)
         {
             activePartyMembers.Add(character);
@@ -75,8 +70,6 @@ public class PartyManager : MonoBehaviour
 
     public void AddCharacterToBattleParty(CharacterData character)
     {
-        Debug.Log("Add Character to BattleParty: " + character.CharacterName);
-
         // Character will probably not have a position, so fill them in to the next available slot
         if (character.FormationPosition == -1)
         {

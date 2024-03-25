@@ -22,12 +22,6 @@ public class Ability
     }
 
     [SerializeField]
-    public string goddamBitch = "Fuck U";
-
-    [SerializeField]
-    public Effect fuckYouBitch;
-
-    [SerializeField]
     public List<Effect> _targetEffects = new List<Effect>();
     public List<Effect> TargetEffects
     {

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -194,15 +193,14 @@ public class BattleManager : MonoBehaviour
     // or just have a separate method for handling items.
     private void HandleAbilityButtonClick(Ability ability)
     {
-        Debug.Log("HandleAbilityButtonClick");
         SelectedAbility = ability;
-        Debug.Log(selectedAbility.AbilityData.abilityName);
-        // if (ability.AbilityData.effects.Any(effect => effect.effectType == EffectType.SkipTurn))
-        // {
-        //     battleUIParent.ClearCharacterData();
-        //     TurnOrderManager.Instance.CharacterTurnComplete(ActiveCharacter);
-        //     return;
-        // }
+
+        if (ability.AbilityData.abilityName == "Skip Turn")
+        {
+            battleUIParent.ClearCharacterData();
+            TurnOrderManager.Instance.CharacterTurnComplete(ActiveCharacter);
+            return;
+        }
 
         battleUIParent.SetAbilityData(ability, activeCharacter);
         TargetSelectionHandler.HideAllTargetIndicators(AllPositions);
@@ -330,7 +328,6 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator HandleTargetSelection(BattleManagerState targetSelectionState)
     {
-        Debug.Log("HandleTargetSelection");
         IsHandlingTargetSelection = true;
         while (CurrentBattleState == targetSelectionState)
         {
@@ -399,13 +396,5 @@ public class BattleManager : MonoBehaviour
         List<BattleCharacter> battleCharacters = caster.PlayerCharacter ? PlayerBattleCharacters : EnemyBattleCharacters;
         List<BattlePosition> battlePositions = caster.PlayerCharacter ? PlayerPositions : EnemyPositions;
         CharacterMovementHandler.Instance.MoveCharacter(caster, target, battleCharacters, battlePositions);
-        // character.BattlePosition.SetOccupyingCharacter(null);
-        // character.BattlePosition = newPosition;
-        // newPosition.SetOccupyingCharacter(character);
-    }
-
-    private BattlePosition GetBattlePosition(int index, TargetFaction targetFaction)
-    {
-        return targetFaction == TargetFaction.Allies ? playerPositions[index] : enemyPositions[index];
     }
 }

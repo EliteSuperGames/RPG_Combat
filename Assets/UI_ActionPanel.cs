@@ -166,7 +166,6 @@ public class UI_ActionPanel : MonoBehaviour
     {
         ClearActionButtons();
 
-        // Create a new list that includes both the character's abilities and the static abilities
         List<EligibleAbility> allAbilities = new List<EligibleAbility>(availableAbilities)
         {
             CreateEligibleAbility(changePositionsAbilityData),

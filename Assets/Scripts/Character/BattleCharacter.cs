@@ -90,21 +90,18 @@ public class BattleCharacter : MonoBehaviour
     {
         // Initialize the lists if needed
 
-        HealthbarController = FindObjectOfType<HealthbarController>();
+        HealthbarController = FindFirstObjectByType<HealthbarController>();
     }
 
     void Update() { }
 
     public void InitializeCharacter(CharacterData data)
     {
-        Debug.Log("InitializeCharacter");
         CharData = data;
         InitialCharacterData = new CharacterData(data);
         PlayerCharacter = data.PlayerCharacter;
         FormationPosition = data.FormationPosition;
-        Debug.Log("FormationPosition: " + FormationPosition + " for " + CharData.CharacterName);
         Abilities = data.Abilities;
-
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
 
         if (spriteRenderer == null)
@@ -143,7 +140,6 @@ public class BattleCharacter : MonoBehaviour
 
     public void SetCurrentBattlePosition(BattlePosition position)
     {
-        Debug.Log("SetCurrentBattlePosition for " + CharData.CharacterName + " to " + position.PositionNumber);
         BattlePosition = position;
         FormationPosition = position.PositionNumber;
     }

@@ -51,8 +51,6 @@ public class UI_TurnOrder : MonoBehaviour
 
     void UpdateTurnOrderUI(List<BattleCharacter> newTurnOrder)
     {
-        Debug.LogError("UpdateTurnOrderUI");
-
         // Destroy all existing children of turnOrderParent
         foreach (Transform child in turnOrderParent)
         {
