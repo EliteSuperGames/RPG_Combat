@@ -24,4 +24,6 @@ MonoBehaviour:
   targetEffects:
   - {fileID: 11400000, guid: 39be5b12da34082468d5d3c86c82444e, type: 2}
   - {fileID: 11400000, guid: 39be5b12da34082468d5d3c86c82444e, type: 2}
+  - {fileID: 11400000, guid: a395cb452e164fb4fbb9aead32aa0d8b, type: 2}
+  - {fileID: 11400000, guid: 21f048ac4e15ba84887789fca39b416f, type: 2}
   casterEffects: []

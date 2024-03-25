@@ -13,14 +13,13 @@ MonoBehaviour:
   m_Name: Skip Turn
   m_EditorClassIdentifier: 
   abilityName: Skip Turn
-  targetFaction: 0
-  launchPositions: 00000000010000000200000003000000
-  targetingType: 0
-  landingPositions: 00000000010000000200000003000000
-  effects: []
   abilityDescription: Skip Turn
+  targetFaction: 0
+  areaOfEffect: 0
+  abilityRange: 0
   cooldownLength: 0
   baseAbilityPower: 0
-  abilityTypes: 04000000
   onlyTargetUnconscious: 0
   canOnlyTargetSelf: 1
+  targetEffects: []
+  casterEffects: []
