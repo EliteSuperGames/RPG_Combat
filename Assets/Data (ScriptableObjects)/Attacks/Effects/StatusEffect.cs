@@ -1,10 +1,12 @@
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using UnityEngine;
 
 [System.Serializable]
 public class StatusEffect : Effect
 {
+    [SerializeField]
     public int duration;
+
+    [SerializeField]
     protected BattleCharacter target;
 
     public StatusEffect(StatusEffectData data)

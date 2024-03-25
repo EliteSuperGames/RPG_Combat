@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bb2bcba5bd8b2342854fe4b24f44476, type: 3}
-  m_Name: Basic Attack
+  m_Name: LineBlaster
   m_EditorClassIdentifier: 
-  abilityName: Basic Attack
-  abilityDescription: Attacks a person
+  abilityName: LineBlaster
+  abilityDescription: Blasts shit in a line
   targetFaction: 1
-  areaOfEffect: 0
-  abilityRange: 3
-  cooldownLength: 0
-  baseAbilityPower: 5
+  areaOfEffect: 2
+  abilityRange: 2
+  cooldownLength: 1
+  baseAbilityPower: 25
   onlyTargetUnconscious: 0
   canOnlyTargetSelf: 0
   targetEffects:

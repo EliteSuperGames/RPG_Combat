@@ -903,6 +903,10 @@ MonoBehaviour:
   activeCharacter: {fileID: 0}
   currentBattleState: 0
   battleCharacterPrefab: {fileID: 5371250921716495302, guid: d60a123cc20b6b147ba7aa4c5036bf25, type: 3}
+  selectedAbility:
+    _abilityData: {fileID: 0}
+    _cooldownTimer: 0
+    goddamBitch: 
   activeTarget: {fileID: 0}
   isHandlingTargetSelection: 0
   currentValidTargets: []
@@ -1393,7 +1397,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -3722,7 +3726,7 @@ Transform:
   m_GameObject: {fileID: 1610528026}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 18.944557, y: 11.337168, z: 1}
+  m_LocalScale: {x: 36.453117, y: 21.512276, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1839097433}

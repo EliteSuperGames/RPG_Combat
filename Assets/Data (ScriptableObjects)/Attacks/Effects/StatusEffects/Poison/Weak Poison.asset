@@ -16,7 +16,7 @@ MonoBehaviour:
   effectName: Weak Poison
   effectDescription: Barely noticeable amount of damage per turn.
   duration: 3
-  isStackable: 0
-  isRenewable: 1
+  isStackable: 1
+  isRenewable: 0
   dispelResistance: 10
   damagePerTurn: 5

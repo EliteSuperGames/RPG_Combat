@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816b6bcf12d4a0d48b16f20da45a2dc5, type: 3}
   m_Name: E_Maniac
   m_EditorClassIdentifier: 
-  characterName: Gail
+  characterName: The Maniac
   maxHealth: 50
   speed: 10
   physicalPower: 10

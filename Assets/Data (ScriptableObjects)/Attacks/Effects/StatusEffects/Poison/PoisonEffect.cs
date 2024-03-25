@@ -1,7 +1,11 @@
+using UnityEngine;
+
 public class PoisonEffect : StatusEffect
 {
+    [SerializeField]
     private PoisonEffectData PoisonData => (PoisonEffectData)data;
 
+    [SerializeField]
     public int DamagePerTurn => PoisonData.damagePerTurn;
 
     public PoisonEffect(PoisonEffectData data)

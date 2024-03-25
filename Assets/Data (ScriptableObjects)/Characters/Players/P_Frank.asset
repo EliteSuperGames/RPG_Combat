@@ -19,6 +19,8 @@ MonoBehaviour:
   magicPower: 3
   playerCharacter: 1
   battleSize: 1
+  magicDefense: 0
+  physicalDefense: 0
   spriteColor: {r: 1, g: 0, b: 0, a: 1}
   characterSprite: {fileID: -971127213, guid: 1ac741f603a41e646a30828d2ae5eea7, type: 3}
   characterPortrait: {fileID: 21300000, guid: 6c7be5760eec81d458049e4f7e3df4e0, type: 3}
@@ -27,5 +29,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ece3dac8cf957b6408f4a2ba2b462706, type: 2}
   - {fileID: 11400000, guid: 221b483002f62c74c98592f1294478ce, type: 2}
   - {fileID: 11400000, guid: 8725d7a07483f9f4baaca05900f1bb68, type: 2}
+  - {fileID: 11400000, guid: 9e5a0bea66061a542a02fc54f0342bbe, type: 2}
+  - {fileID: 11400000, guid: 7c262c0a02956a34e9073354109e0faa, type: 2}
+  range: 0
   forwardMovement: 1
   backwardMovement: 1

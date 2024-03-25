@@ -129,10 +129,6 @@ public static class TargetSelectionHandler
         Ability SelectedAbility
     )
     {
-        Debug.Log("OnTargetHover");
-        Debug.Log("active character: " + caster.CharData.CharacterName);
-        Debug.Log("hover target: " + hoverTarget.CharData.CharacterName);
-        Debug.Log("selected ability: " + SelectedAbility.AbilityData.abilityName);
         if (target != null)
         {
             target.BattlePosition.HideTransparentTarget();
@@ -354,10 +350,6 @@ public static class TargetSelectionHandler
 
         bool showHostileColor = false;
 
-        Debug.Log("character is at position: " + activeCharIndex);
-        Debug.Log("maxForwardPosition: " + maxForwardPosition);
-        Debug.Log("maxBackwardPosition: " + maxBackwardPosition);
-
         // check if the ability has a move self effect
         // foreach (var effect in ability.AbilityData.effects)
         // {
@@ -366,7 +358,6 @@ public static class TargetSelectionHandler
         // }
         if (ability.AbilityData.abilityName == "Change Positions")
         {
-            Debug.Log("has move self effect");
             currentValidTargets = new List<BattlePosition>();
 
             // Assume characterCurrentPosition is the current position of the character
@@ -380,17 +371,11 @@ public static class TargetSelectionHandler
             int forwardPosition = Math.Max(0, characterCurrentPosition - forwardMovement);
             int backwardPosition = Math.Min(3, characterCurrentPosition + backwardMovement);
 
-            Debug.Log("forwardPosition: " + forwardPosition);
-            Debug.Log("backwardPosition: " + backwardPosition);
-            Debug.Log("forwardMovement: " + forwardMovement);
-            Debug.Log("backwardMovement: " + backwardMovement);
-
             // Add all positions in the range to currentValidTargets
             for (int i = forwardPosition; i <= backwardPosition; i++)
             {
                 if (i != characterCurrentPosition)
                 {
-                    Debug.Log("adding position: " + i + " to currentValidTargets");
                     BattlePosition validPosition = GetPlayerPositionByNumber(caster.PlayerCharacter ? playerPositions : enemyPositions, i);
                     validPosition.EnableTargetableIndicator(showHostileColor); // Add this line
                     currentValidTargets.Add(validPosition);
@@ -400,15 +385,12 @@ public static class TargetSelectionHandler
         }
         else
         {
-            Debug.LogError("Else");
             if (ability.AbilityData.targetFaction == TargetFaction.Allies)
             {
-                Debug.Log("Ally targets");
                 battlePositionsToProcess = caster.PlayerCharacter ? playerPositions : enemyPositions;
             }
             else
             {
-                Debug.Log("Enemy Targets");
                 showHostileColor = true;
                 battlePositionsToProcess = caster.PlayerCharacter ? enemyPositions : playerPositions;
             }

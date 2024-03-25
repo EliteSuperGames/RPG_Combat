@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Ability", menuName = "Attacks/Ability")]
 public class AbilityData : ScriptableObject
 {
+    [SerializeField]
     public string abilityName;
 
     [Space(15)]

@@ -317,7 +317,11 @@ public class BattleCharacter : MonoBehaviour
         totalFireDamage = StatusEffects.OfType<FireEffect>().Sum(effect => effect.DamagePerTurn);
         totalHealing = StatusEffects.OfType<HealOverTimeEffect>().Sum(effect => effect.healPerTurn);
         StatusEffects.RemoveAll(effect => effect.duration <= 0);
-
+        if (totalHealing > 0)
+        {
+            Debug.Log("Healing: " + totalHealing);
+            RestoreHealth(totalHealing);
+        }
         if (totalPoisonDamage > 0)
         {
             Debug.Log("Taking poison damage: " + totalPoisonDamage);
@@ -328,12 +332,6 @@ public class BattleCharacter : MonoBehaviour
         {
             Debug.Log("Taking fire damage: " + totalFireDamage);
             TakeDamage(totalFireDamage);
-        }
-
-        if (totalHealing > 0)
-        {
-            Debug.Log("Healing: " + totalHealing);
-            RestoreHealth(totalHealing);
         }
     }
 

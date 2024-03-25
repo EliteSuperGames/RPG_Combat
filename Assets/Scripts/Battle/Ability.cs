@@ -1,9 +1,11 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
+
+using UnityEngine;
 
 [System.Serializable]
 public class Ability
 {
+    [SerializeField]
     private AbilityData _abilityData;
     public AbilityData AbilityData
     {
@@ -11,6 +13,7 @@ public class Ability
         set => _abilityData = value;
     }
 
+    [SerializeField]
     private int _cooldownTimer;
     public int CooldownTimer
     {
@@ -18,22 +21,31 @@ public class Ability
         set => _cooldownTimer = value;
     }
 
-    private List<Effect> _targetEffects = new List<Effect>();
+    [SerializeField]
+    public string goddamBitch = "Fuck U";
+
+    [SerializeField]
+    public Effect fuckYouBitch;
+
+    [SerializeField]
+    public List<Effect> _targetEffects = new List<Effect>();
     public List<Effect> TargetEffects
     {
         get => _targetEffects;
-        private set => _targetEffects = value;
+        set => _targetEffects = value;
     }
-    private List<Effect> _casterEffects = new List<Effect>();
+
+    [SerializeField]
+    public List<Effect> _casterEffects = new List<Effect>();
     public List<Effect> CasterEffects
     {
         get => _casterEffects;
-        private set => _casterEffects = value;
+        set => _casterEffects = value;
     }
 
     public Ability(AbilityData abilityData)
     {
-        this._abilityData = abilityData;
+        _abilityData = abilityData;
         _cooldownTimer = 0;
         TargetEffects = new List<Effect>();
         foreach (var effectData in abilityData.targetEffects)
