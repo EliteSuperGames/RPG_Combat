@@ -21,6 +21,7 @@ MonoBehaviour:
   isStackable: 0
   isRenewable: 1
   dispelResistance: 0
+  effectType: 4
   maxHealthBoost: 0
   attackBoost: 0
   speedBoost: 0

@@ -41,6 +41,7 @@ public class StatBoostEffectData : StatusEffectData
         clonedData.effectName = effectName;
         clonedData.name = name;
 
+        clonedData.effectType = effectType;
         return clonedData;
     }
 

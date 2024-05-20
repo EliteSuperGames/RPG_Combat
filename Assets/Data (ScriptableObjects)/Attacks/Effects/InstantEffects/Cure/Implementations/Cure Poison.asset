@@ -9,14 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3105893f98b3e4941b9ed6f1c0fb2243, type: 3}
-  m_Name: Minor Renew
+  m_Script: {fileID: 11500000, guid: dd379803fb6db0742a7133278703aac4, type: 3}
+  m_Name: Cure Poison
   m_EditorClassIdentifier: 
   applicationChance: 100
-  effectName: Minor Renew
-  effectDescription: Restores 5 health per turn
-  duration: 3
-  isStackable: 1
-  isRenewable: 0
-  dispelResistance: 0
-  healPerTurn: 5
+  effectName: Cure Poison
+  effectDescription: Cures Poison
+  TypesOfEffectsCured: 01000000

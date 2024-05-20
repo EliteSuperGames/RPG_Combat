@@ -53,17 +53,41 @@ public static class TargetSelectionHandler
     {
         IEnumerable<BattlePosition> targetList;
 
-        if (caster.PlayerCharacter)
+        // Determine target list based on ability's target faction
+        if (ability.AbilityData.targetFaction == TargetFaction.Allies)
         {
-            targetList = enemyPositions;
+            targetList = caster.PlayerCharacter ? playerPositions : enemyPositions;
         }
         else
         {
-            targetList = playerPositions;
+            targetList = caster.PlayerCharacter ? enemyPositions : playerPositions;
         }
+
         if (ability.AbilityData.onlyTargetUnconscious)
         {
-            return targetList.Any(pos => pos.BattleCharacter.CurrentState == CharacterState.Unconscious);
+            for (int i = 0; i < targetList.Count(); i++)
+            {
+                Debug.Log(
+                    "targetList["
+                        + i
+                        + "]: "
+                        + targetList.ElementAt(i).BattleCharacter.CharData.CharacterName
+                        + " is "
+                        + targetList.ElementAt(i).BattleCharacter.CurrentState
+                );
+            }
+            Debug.Log("ability only targets unconscious");
+            if (targetList.Any(pos => pos.BattleCharacter.CurrentState == CharacterState.Unconscious))
+            {
+                Debug.Log("found unconscious target");
+                return true;
+            }
+            // return targetList.Any(pos => pos.BattleCharacter.CurrentState == CharacterState.Unconscious);
+            else
+            {
+                Debug.Log("didnt find unconscious target");
+                return false;
+            }
         }
 
         if (ability.AbilityData.abilityRange == AbilityRange.Short)
@@ -258,17 +282,6 @@ public static class TargetSelectionHandler
 
         foreach (var pos in positionsToProcess)
         {
-            if (ability.AbilityData.areaOfEffect == AreaOfEffect.SameRow)
-            {
-                if (
-                    (target.BattlePosition.PositionNumber <= 2 && pos.PositionNumber <= 2)
-                    || (target.BattlePosition.PositionNumber > 2 && pos.PositionNumber > 2)
-                )
-                {
-                    targetsToReturn.Add(pos.BattleCharacter);
-                }
-            }
-
             if (ability.AbilityData.areaOfEffect == AreaOfEffect.SameRow)
             {
                 int clickTargetRow = target.BattlePosition.PositionNumber <= 2 ? 0 : 1;

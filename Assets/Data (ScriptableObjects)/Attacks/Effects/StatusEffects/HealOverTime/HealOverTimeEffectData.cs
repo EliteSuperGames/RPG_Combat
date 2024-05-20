@@ -19,6 +19,7 @@ public class HealOverTimeEffectData : StatusEffectData
         clonedData.effectDescription = effectDescription;
         clonedData.effectName = effectName;
         clonedData.name = name;
+        clonedData.effectType = effectType;
 
         return clonedData;
     }

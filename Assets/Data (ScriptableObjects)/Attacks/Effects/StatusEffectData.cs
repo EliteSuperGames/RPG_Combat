@@ -14,5 +14,8 @@ public abstract class StatusEffectData : EffectData
     [SerializeField]
     public float dispelResistance;
 
+    [SerializeField]
+    public EffectType effectType;
+
     public abstract StatusEffectData Clone();
 }

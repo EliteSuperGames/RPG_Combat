@@ -55,12 +55,20 @@ public class Ability
 
     public void Use(BattleCharacter caster, List<BattleCharacter> targets)
     {
+        for (int i = 0; i < targets.Count; i++)
+        {
+            Debug.Log("Target is: " + targets[i].CharData.CharacterName);
+        }
+        Debug.Log("Using " + AbilityData.name);
         foreach (var target in targets)
         {
+            Debug.Log("Target is: " + target.CharData.CharacterName);
             foreach (var effect in TargetEffects)
             {
+                Debug.Log("Applying effect: " + effect.data.name + " to target: " + target.CharData.CharacterName);
                 if (effect is StatusEffect statusEffect)
                 {
+                    Debug.Log("Cloning status effect: " + statusEffect.data.name);
                     var clonedEffect = statusEffect.Clone();
                     clonedEffect.Apply(caster, target);
                 }
@@ -70,18 +78,18 @@ public class Ability
                 }
             }
 
-            foreach (var effect in CasterEffects)
-            {
-                if (effect is StatusEffect statusEffect)
-                {
-                    var clonedEffect = statusEffect.Clone();
-                    clonedEffect.Apply(caster, caster);
-                }
-                else
-                {
-                    effect.Apply(caster, caster);
-                }
-            }
+            // foreach (var effect in CasterEffects)
+            // {
+            //     if (effect is StatusEffect statusEffect)
+            //     {
+            //         var clonedEffect = statusEffect.Clone();
+            //         clonedEffect.Apply(caster, caster);
+            //     }
+            //     else
+            //     {
+            //         effect.Apply(caster, caster);
+            //     }
+            // }
         }
         if (_abilityData.cooldownLength > 0)
         {

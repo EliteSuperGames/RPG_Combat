@@ -299,6 +299,17 @@ public class BattleCharacter : MonoBehaviour
 
     #region Status Effects
 
+    private void ReduceAbilityCooldowns()
+    {
+        foreach (var ability in Abilities)
+        {
+            if (ability.CooldownTimer > 0)
+            {
+                ability.CooldownTimer--;
+            }
+        }
+    }
+
     private void ProcessStatusEffectsOnTurnStart()
     {
         int totalPoisonDamage = 0;
@@ -346,6 +357,7 @@ public class BattleCharacter : MonoBehaviour
 
     public void UseAbility(List<BattleCharacter> targets, Ability ability)
     {
+        Debug.LogError("UseAbility! " + ability.AbilityData.abilityName);
         Debug.Log(CharData.CharacterName + " is using this ability: " + ability.AbilityData.abilityName);
         ability.Use(this, targets);
     }
@@ -362,6 +374,7 @@ public class BattleCharacter : MonoBehaviour
     public void StartTurn()
     {
         ProcessStatusEffectsOnTurnStart();
+        ReduceAbilityCooldowns();
     }
 
     public void EndTurn()
